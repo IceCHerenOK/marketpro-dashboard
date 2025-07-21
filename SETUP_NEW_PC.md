@@ -18,8 +18,8 @@ git --version
 
 ### 1. Клонирование репозитория
 ```bash
-# Замените <URL_РЕПОЗИТОРИЯ> на актуальный URL
-git clone <URL_РЕПОЗИТОРИЯ>
+# Клонирование проекта с GitHub
+git clone https://github.com/IceCHerenOK/marketpro-dashboard.git
 cd marketpro-dashboard
 ```
 
