@@ -1,0 +1,42 @@
+const fs = require('fs');
+const path = require('path');
+
+// Создаем простую SVG иконку для MarketPro
+const svgIcon = `<?xml version="1.0" encoding="UTF-8"?>
+<svg width="256" height="256" viewBox="0 0 256 256" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <linearGradient id="gradient" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" style="stop-color:#4f46e5;stop-opacity:1" />
+      <stop offset="100%" style="stop-color:#7c3aed;stop-opacity:1" />
+    </linearGradient>
+  </defs>
+  
+  <!-- Background circle -->
+  <circle cx="128" cy="128" r="120" fill="url(#gradient)" />
+  
+  <!-- Store building -->
+  <rect x="64" y="96" width="128" height="112" fill="white" opacity="0.9" rx="8"/>
+  
+  <!-- Roof -->
+  <polygon points="56,96 128,64 200,96 192,88 128,56 64,88" fill="white" opacity="0.95"/>
+  
+  <!-- Door -->
+  <rect x="112" y="144" width="32" height="64" fill="url(#gradient)" opacity="0.8" rx="4"/>
+  
+  <!-- Windows -->
+  <rect x="80" y="120" width="20" height="20" fill="url(#gradient)" opacity="0.7" rx="2"/>
+  <rect x="156" y="120" width="20" height="20" fill="url(#gradient)" opacity="0.7" rx="2"/>
+  
+  <!-- Sign -->
+  <rect x="88" y="160" width="80" height="24" fill="white" opacity="0.9" rx="4"/>
+  <text x="128" y="176" font-family="Arial, sans-serif" font-size="14" font-weight="bold" text-anchor="middle" fill="#4f46e5">MarketPro</text>
+</svg>`;
+
+// Сохраняем SVG файл
+fs.writeFileSync(path.join(__dirname, 'assets', 'icon.svg'), svgIcon);
+
+console.log('✅ SVG иконка создана: assets/icon.svg');
+console.log('📝 Для создания ICO файла используйте онлайн конвертер или ImageMagick:');
+console.log('   https://convertio.co/svg-ico/');
+console.log('   или установите ImageMagick и выполните:');
+console.log('   magick assets/icon.svg -define icon:auto-resize=256,128,64,48,32,16 assets/icon.ico');

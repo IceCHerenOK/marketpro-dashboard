@@ -1,0 +1,60 @@
+
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Icon Generator</title>
+</head>
+<body>
+    <canvas id="canvas" width="256" height="256"></canvas>
+    <script>
+        const canvas = document.getElementById('canvas');
+        const ctx = canvas.getContext('2d');
+        
+        // Создаем градиент
+        const gradient = ctx.createLinearGradient(0, 0, 256, 256);
+        gradient.addColorStop(0, '#4f46e5');
+        gradient.addColorStop(1, '#7c3aed');
+        
+        // Рисуем фон
+        ctx.fillStyle = gradient;
+        ctx.beginPath();
+        ctx.arc(128, 128, 120, 0, 2 * Math.PI);
+        ctx.fill();
+        
+        // Рисуем здание магазина
+        ctx.fillStyle = 'rgba(255, 255, 255, 0.9)';
+        ctx.fillRect(64, 96, 128, 96);
+        
+        // Рисуем крышу
+        ctx.fillStyle = 'rgba(255, 255, 255, 0.8)';
+        ctx.beginPath();
+        ctx.moveTo(56, 96);
+        ctx.lineTo(128, 64);
+        ctx.lineTo(200, 96);
+        ctx.lineTo(192, 88);
+        ctx.lineTo(128, 56);
+        ctx.lineTo(64, 88);
+        ctx.closePath();
+        ctx.fill();
+        
+        // Рисуем дверь
+        ctx.fillStyle = 'rgba(79, 70, 229, 0.8)';
+        ctx.fillRect(112, 144, 32, 48);
+        
+        // Рисуем окна
+        ctx.fillStyle = 'rgba(79, 70, 229, 0.6)';
+        ctx.fillRect(80, 120, 20, 20);
+        ctx.fillRect(156, 120, 20, 20);
+        
+        // Рисуем текст MP
+        ctx.fillStyle = 'white';
+        ctx.font = 'bold 20px Arial';
+        ctx.textAlign = 'center';
+        ctx.fillText('MP', 128, 140);
+        
+        // Выводим результат в консоль (base64)
+        console.log('Icon created successfully!');
+        console.log('Canvas data URL:', canvas.toDataURL());
+    </script>
+</body>
+</html>
