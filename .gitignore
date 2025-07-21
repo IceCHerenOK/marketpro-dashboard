@@ -79,3 +79,15 @@ out/
 # Temporary folders
 tmp/
 temp/
+
+# Archive files
+*.zip
+*.rar
+*.7z
+*.tar.gz
+
+# Large build files
+*.exe
+*.msi
+*.dmg
+*.pkg
