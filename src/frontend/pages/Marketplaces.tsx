@@ -36,7 +36,7 @@ export default function Marketplaces() {
         {
           id: 'wildberries',
           name: 'Wildberries',
-          logo: '/logos/wb.png',
+          logo: '/logos/wb.svg',
           description: 'Крупнейший маркетплейс в России',
           features: ['orders', 'products', 'analytics', 'finance'],
           connected: Math.random() > 0.5,
@@ -45,7 +45,7 @@ export default function Marketplaces() {
         {
           id: 'ozon',
           name: 'OZON',
-          logo: '/logos/ozon.png',
+          logo: '/logos/ozon.svg',
           description: 'Один из ведущих маркетплейсов',
           features: ['orders', 'products', 'analytics', 'advertising', 'finance'],
           connected: Math.random() > 0.5,
@@ -54,7 +54,7 @@ export default function Marketplaces() {
         {
           id: 'yandex_market',
           name: 'Яндекс Маркет',
-          logo: '/logos/yandex.png',
+          logo: '/logos/yandex.svg',
           description: 'Маркетплейс от Яндекса',
           features: ['orders', 'products', 'analytics', 'advertising'],
           connected: Math.random() > 0.5
@@ -62,7 +62,7 @@ export default function Marketplaces() {
         {
           id: 'megamarket',
           name: 'Мегамаркет',
-          logo: '/logos/megamarket.png',
+          logo: '/logos/megamarket.svg',
           description: 'Маркетплейс от Сбера',
           features: ['orders', 'products'],
           connected: false
@@ -70,7 +70,7 @@ export default function Marketplaces() {
         {
           id: 'magnitmarket',
           name: 'Магнит Маркет',
-          logo: '/logos/magnit.png',
+          logo: '/logos/magnitmarket.svg',
           description: 'Маркетплейс от Магнита',
           features: ['orders', 'products'],
           connected: false
@@ -85,7 +85,7 @@ export default function Marketplaces() {
         {
           id: 'wildberries',
           name: 'Wildberries',
-          logo: '/logos/wb.png',
+          logo: '/logos/wb.svg',
           description: 'Крупнейший маркетплейс в России',
           features: ['orders', 'products', 'analytics', 'finance'],
           connected: false
@@ -93,7 +93,7 @@ export default function Marketplaces() {
         {
           id: 'ozon',
           name: 'OZON',
-          logo: '/logos/ozon.png',
+          logo: '/logos/ozon.svg',
           description: 'Один из ведущих маркетплейсов',
           features: ['orders', 'products', 'analytics', 'advertising', 'finance'],
           connected: false

@@ -1,15 +1,27 @@
 // Заглушка для базы данных без sqlite3
 const db = {
   run: (sql: string, params?: any, callback?: Function) => {
-    console.log('DB Mock - SQL:', sql);
+    if (typeof params === 'function') {
+      callback = params;
+      params = undefined;
+    }
+    console.log('DB Mock - SQL:', sql, params ? `| params: ${JSON.stringify(params)}` : '');
     if (callback) callback(null);
   },
   get: (sql: string, params?: any, callback?: Function) => {
-    console.log('DB Mock - GET:', sql);
+    if (typeof params === 'function') {
+      callback = params;
+      params = undefined;
+    }
+    console.log('DB Mock - GET:', sql, params ? `| params: ${JSON.stringify(params)}` : '');
     if (callback) callback(null, null);
   },
   all: (sql: string, params?: any, callback?: Function) => {
-    console.log('DB Mock - ALL:', sql);
+    if (typeof params === 'function') {
+      callback = params;
+      params = undefined;
+    }
+    console.log('DB Mock - ALL:', sql, params ? `| params: ${JSON.stringify(params)}` : '');
     if (callback) callback(null, []);
   },
   serialize: (callback: Function) => {
