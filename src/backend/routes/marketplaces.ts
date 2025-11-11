@@ -9,47 +9,52 @@ import authenticateToken from '../middleware/auth';
 
 const marketplacesRouter = expressMarketplaces.Router()
 
-// Получить список поддерживаемых маркетплейсов
+const supportedMarketplaces = [
+  {
+    id: 'wildberries',
+    name: 'Wildberries',
+    logo: '/logos/wb.svg',
+    description: 'Крупнейший российский маркетплейс',
+    features: ['orders', 'products', 'analytics', 'advertising', 'finance']
+  },
+  {
+    id: 'ozon',
+    name: 'OZON',
+    logo: '/logos/ozon.svg',
+    description: 'Универсальный интернет-магазин',
+    features: ['orders', 'products', 'analytics', 'advertising', 'finance']
+  },
+  {
+    id: 'yandex_market',
+    name: 'Яндекс Маркет',
+    logo: '/logos/yandex.svg',
+    description: 'Торговая площадка Яндекса',
+    features: ['orders', 'products', 'analytics', 'finance']
+  },
+  {
+    id: 'megamarket',
+    name: 'Мегамаркет',
+    logo: '/logos/megamarket.svg',
+    description: 'Маркетплейс Сбера',
+    features: ['orders', 'products', 'analytics']
+  },
+  {
+    id: 'magnitmarket',
+    name: 'Магнитмаркет',
+    logo: '/logos/magnitmarket.svg',
+    description: 'Маркетплейс Магнита',
+    features: ['orders', 'products']
+  }
+]
+
+// Получить список поддерживаемых маркетплейсов (основной эндпоинт, используемый фронтендом)
+marketplacesRouter.get('/', (req, res) => {
+  res.json(supportedMarketplaces)
+})
+
+// Сохранена старая подпись, чтобы не ломать интеграции, ожидающие /supported
 marketplacesRouter.get('/supported', (req, res) => {
-  const marketplaces = [
-    {
-      id: 'wildberries',
-      name: 'Wildberries',
-      logo: '/assets/logos/wb.png',
-      description: 'Крупнейший российский маркетплейс',
-      features: ['orders', 'products', 'analytics', 'advertising', 'finance']
-    },
-    {
-      id: 'ozon',
-      name: 'OZON',
-      logo: '/assets/logos/ozon.png',
-      description: 'Универсальный интернет-магазин',
-      features: ['orders', 'products', 'analytics', 'advertising', 'finance']
-    },
-    {
-      id: 'yandex_market',
-      name: 'Яндекс Маркет',
-      logo: '/assets/logos/yandex.png',
-      description: 'Торговая площадка Яндекса',
-      features: ['orders', 'products', 'analytics', 'finance']
-    },
-    {
-      id: 'megamarket',
-      name: 'Мегамаркет',
-      logo: '/assets/logos/megamarket.png',
-      description: 'Маркетплейс Сбера',
-      features: ['orders', 'products', 'analytics']
-    },
-    {
-      id: 'magnitmarket',
-      name: 'Магнитмаркет',
-      logo: '/assets/logos/magnitmarket.png',
-      description: 'Маркетплейс Магнита',
-      features: ['orders', 'products']
-    }
-  ]
-  
-  res.json(marketplaces)
+  res.json(supportedMarketplaces)
 })
 
 // Получить настройки маркетплейсов пользователя
@@ -82,37 +87,27 @@ marketplacesRouter.post('/test-connection/:marketplace', authenticateToken, asyn
   try {
     const { marketplace } = req.params
     const { apiKey, clientId, secretKey } = req.body
-    
-    let api: any
-    
-    switch (marketplace) {
-      case 'wildberries':
-        // api = new WildberriesAPI(apiKey) // TODO: Implement API classes
-        break
-      case 'ozon':
-        // api = new OzonAPI(clientId, apiKey) // TODO: Implement API classes
-        break
-      case 'yandex_market':
-        // api = new YandexMarketAPI(apiKey, clientId) // TODO: Implement API classes
-        break
-      case 'megamarket':
-        // api = new MegamarketAPI(apiKey) // TODO: Implement API classes
-        break
-      case 'magnitmarket':
-        // api = new MagnitmarketAPI(apiKey) // TODO: Implement API classes
-        break
-      default:
-        return res.status(400).json({ error: 'Неподдерживаемый маркетплейс' })
+
+    const supportedMarketplaces = ['wildberries', 'ozon', 'yandex_market', 'megamarket', 'magnitmarket']
+    if (!supportedMarketplaces.includes(marketplace)) {
+      return res.status(400).json({ success: false, error: 'Неподдерживаемый маркетплейс' })
     }
-    
-    const testResult = await api.testConnection()
-    res.json({ success: true, data: testResult })
-    
+
+    res.json({
+      success: true,
+      message: 'Тестовое подключение эмулировано. Реальная интеграция будет добавлена позднее.',
+      marketplace,
+      receivedCredentials: {
+        apiKey: Boolean(apiKey),
+        clientId: Boolean(clientId),
+        secretKey: Boolean(secretKey)
+      }
+    })
   } catch (error) {
-    res.status(400).json({ 
-      success: false, 
-      error: 'Ошибка подключения к маркетплейсу',
-      details: error.message 
+    res.status(500).json({
+      success: false,
+      error: 'Ошибка тестирования подключения',
+      details: error instanceof Error ? error.message : 'Неизвестная ошибка'
     })
   }
 })
