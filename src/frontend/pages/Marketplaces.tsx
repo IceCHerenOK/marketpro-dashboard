@@ -31,6 +31,17 @@ export default function Marketplaces() {
       setLoading(true)
       // Используем метод из нашего API клиента
       const data = await api.marketplaces.getAll()
+
+      if (Array.isArray(data) && data.length > 0) {
+        const normalized = data.map((marketplace: any) => ({
+          ...marketplace,
+          connected: Boolean(marketplace.connected),
+          lastSync: marketplace.lastSync ?? undefined,
+        }))
+        setMarketplaces(normalized)
+        return
+      }
+
       // Если API еще не реализовано, используем временные данные
       const mockMarketplaces = [
         {
@@ -76,7 +87,7 @@ export default function Marketplaces() {
           connected: false
         }
       ];
-      
+
       setMarketplaces(mockMarketplaces);
     } catch (error) {
       console.error('Ошибка загрузки маркетплейсов:', error)

@@ -9,47 +9,52 @@ import authenticateToken from '../middleware/auth';
 
 const marketplacesRouter = expressMarketplaces.Router()
 
-// Получить список поддерживаемых маркетплейсов
+const supportedMarketplaces = [
+  {
+    id: 'wildberries',
+    name: 'Wildberries',
+    logo: '/logos/wb.svg',
+    description: 'Крупнейший российский маркетплейс',
+    features: ['orders', 'products', 'analytics', 'advertising', 'finance']
+  },
+  {
+    id: 'ozon',
+    name: 'OZON',
+    logo: '/logos/ozon.svg',
+    description: 'Универсальный интернет-магазин',
+    features: ['orders', 'products', 'analytics', 'advertising', 'finance']
+  },
+  {
+    id: 'yandex_market',
+    name: 'Яндекс Маркет',
+    logo: '/logos/yandex.svg',
+    description: 'Торговая площадка Яндекса',
+    features: ['orders', 'products', 'analytics', 'finance']
+  },
+  {
+    id: 'megamarket',
+    name: 'Мегамаркет',
+    logo: '/logos/megamarket.svg',
+    description: 'Маркетплейс Сбера',
+    features: ['orders', 'products', 'analytics']
+  },
+  {
+    id: 'magnitmarket',
+    name: 'Магнитмаркет',
+    logo: '/logos/magnitmarket.svg',
+    description: 'Маркетплейс Магнита',
+    features: ['orders', 'products']
+  }
+]
+
+// Получить список поддерживаемых маркетплейсов (основной эндпоинт, используемый фронтендом)
+marketplacesRouter.get('/', (req, res) => {
+  res.json(supportedMarketplaces)
+})
+
+// Сохранена старая подпись, чтобы не ломать интеграции, ожидающие /supported
 marketplacesRouter.get('/supported', (req, res) => {
-  const marketplaces = [
-    {
-      id: 'wildberries',
-      name: 'Wildberries',
-      logo: '/logos/wb.svg',
-      description: 'Крупнейший российский маркетплейс',
-      features: ['orders', 'products', 'analytics', 'advertising', 'finance']
-    },
-    {
-      id: 'ozon',
-      name: 'OZON',
-      logo: '/logos/ozon.svg',
-      description: 'Универсальный интернет-магазин',
-      features: ['orders', 'products', 'analytics', 'advertising', 'finance']
-    },
-    {
-      id: 'yandex_market',
-      name: 'Яндекс Маркет',
-      logo: '/logos/yandex.svg',
-      description: 'Торговая площадка Яндекса',
-      features: ['orders', 'products', 'analytics', 'finance']
-    },
-    {
-      id: 'megamarket',
-      name: 'Мегамаркет',
-      logo: '/logos/megamarket.svg',
-      description: 'Маркетплейс Сбера',
-      features: ['orders', 'products', 'analytics']
-    },
-    {
-      id: 'magnitmarket',
-      name: 'Магнитмаркет',
-      logo: '/logos/magnitmarket.svg',
-      description: 'Маркетплейс Магнита',
-      features: ['orders', 'products']
-    }
-  ]
-  
-  res.json(marketplaces)
+  res.json(supportedMarketplaces)
 })
 
 // Получить настройки маркетплейсов пользователя
