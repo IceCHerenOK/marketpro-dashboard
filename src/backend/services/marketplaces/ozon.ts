@@ -20,9 +20,9 @@ export class OzonAPI {
 
   async testConnection(): Promise<any> {
     try {
-      const response = await this.api.post('/v1/report/info')
+      const response = await this.api.post('/v1/warehouse/list')
       return { success: true, data: response.data }
-    } catch (error) {
+    } catch (error: any) {
       throw new Error(`Ошибка подключения к OZON: ${error.response?.data?.message || error.message}`)
     }
   }
@@ -35,7 +35,7 @@ export class OzonAPI {
       
       const response = await this.api.post('/v2/product/list', body)
       return response.data
-    } catch (error) {
+    } catch (error: any) {
       throw new Error(`Ошибка получения товаров: ${error.response?.data?.message || error.message}`)
     }
   }
@@ -47,7 +47,7 @@ export class OzonAPI {
         product_id: productId
       })
       return response.data
-    } catch (error) {
+    } catch (error: any) {
       throw new Error(`Ошибка получения информации о товаре: ${error.response?.data?.message || error.message}`)
     }
   }
@@ -69,7 +69,7 @@ export class OzonAPI {
       
       const response = await this.api.post('/v3/posting/fbs/list', body)
       return response.data
-    } catch (error) {
+    } catch (error: any) {
       throw new Error(`Ошибка получения заказов: ${error.response?.data?.message || error.message}`)
     }
   }
@@ -82,7 +82,7 @@ export class OzonAPI {
         offset: 0
       })
       return response.data
-    } catch (error) {
+    } catch (error: any) {
       throw new Error(`Ошибка получения остатков: ${error.response?.data?.message || error.message}`)
     }
   }
@@ -97,7 +97,7 @@ export class OzonAPI {
         }
       })
       return response.data
-    } catch (error) {
+    } catch (error: any) {
       throw new Error(`Ошибка получения финансовых отчетов: ${error.response?.data?.message || error.message}`)
     }
   }
@@ -109,12 +109,12 @@ export class OzonAPI {
         date_from: dateFrom,
         date_to: dateTo,
         metrics,
-        dimension: ['sku'],
+        dimensions: ['sku'],
         filters: [],
         sort: []
       })
       return response.data
-    } catch (error) {
+    } catch (error: any) {
       throw new Error(`Ошибка получения аналитики: ${error.response?.data?.message || error.message}`)
     }
   }
@@ -126,7 +126,7 @@ export class OzonAPI {
         prices
       })
       return response.data
-    } catch (error) {
+    } catch (error: any) {
       throw new Error(`Ошибка обновления цен: ${error.response?.data?.message || error.message}`)
     }
   }
@@ -138,7 +138,7 @@ export class OzonAPI {
         stocks
       })
       return response.data
-    } catch (error) {
+    } catch (error: any) {
       throw new Error(`Ошибка обновления остатков: ${error.response?.data?.message || error.message}`)
     }
   }
@@ -146,9 +146,12 @@ export class OzonAPI {
   // Получить рекламные кампании
   async getAdvertisingCampaigns(): Promise<any> {
     try {
-      const response = await this.api.get('/v1/supplier/performance')
+      const response = await this.api.post('/v1/marketing/campaign/list', {
+        page_size: 100,
+        page: 1
+      })
       return response.data
-    } catch (error) {
+    } catch (error: any) {
       throw new Error(`Ошибка получения рекламных кампаний: ${error.response?.data?.message || error.message}`)
     }
   }
@@ -160,7 +163,7 @@ export class OzonAPI {
         items: [productData]
       })
       return response.data
-    } catch (error) {
+    } catch (error: any) {
       throw new Error(`Ошибка создания товара: ${error.response?.data?.message || error.message}`)
     }
   }

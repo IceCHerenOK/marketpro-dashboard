@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react'
 import { api } from '../utils/api'
-import { Megaphone, Plus, Play, Pause, BarChart3, Eye } from 'lucide-react'
+import { Megaphone, Plus, BarChart3, Eye } from 'lucide-react'
 
 interface Campaign {
   id: number
@@ -26,6 +26,7 @@ export default function Advertising() {
     conversionRate: 0
   })
   const [loading, setLoading] = useState(true)
+  const [error, setError] = useState<string | null>(null)
 
   useEffect(() => {
     fetchAdvertisingData()
@@ -34,16 +35,27 @@ export default function Advertising() {
   const fetchAdvertisingData = async () => {
     try {
       setLoading(true)
-      
+      setError(null)
+
       const [campaignsRes, statsRes] = await Promise.all([
-        api.get('/advertising/campaigns'),
-        api.get('/advertising/stats')
+        api.advertising.getCampaigns(),
+        api.advertising.getStats()
       ])
 
-      setCampaigns(campaignsRes.data.campaigns || [])
-      setStats(statsRes.data)
+      setCampaigns(campaignsRes.campaigns || [])
+      setStats(statsRes)
     } catch (error) {
       console.error('Ошибка загрузки рекламных данных:', error)
+      setError('Не удалось загрузить рекламные данные')
+      setCampaigns([])
+      setStats({
+        totalBudget: 0,
+        totalSpent: 0,
+        totalClicks: 0,
+        totalImpressions: 0,
+        ctr: 0,
+        conversionRate: 0
+      })
     } finally {
       setLoading(false)
     }
@@ -95,6 +107,10 @@ export default function Advertising() {
           Создать кампанию
         </button>
       </div>
+
+      {error && (
+        <div className="p-4 rounded-lg bg-red-50 text-red-700">{error}</div>
+      )}
 
       {/* Основные метрики */}
       <div className="grid grid-cols-1 md:grid-cols-4 gap-6">

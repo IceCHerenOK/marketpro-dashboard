@@ -1,277 +1,329 @@
-import React, { useState } from 'react'
+import React, { useEffect, useMemo, useState } from 'react'
 import { useLocation, useNavigate } from 'react-router-dom'
+import type { LucideIcon } from 'lucide-react'
+import {
+  Bell,
+  ChevronDown,
+  LayoutDashboard,
+  LineChart,
+  LogOut,
+  Megaphone,
+  Menu,
+  Moon,
+  Package,
+  Search,
+  Settings,
+  ShoppingBag,
+  ShoppingCart,
+  Sparkles,
+  Store,
+  Sun,
+  Users,
+  Wallet
+} from 'lucide-react'
 import { useAuth } from '../contexts/AuthContext'
-import '../styles/1c-theme.css'
+import { useTheme } from '../contexts/ThemeContext'
+import '../styles/dashboard-layout.css'
 
-interface MenuItem {
+type MenuItem = {
   id: string
-  name: string
-  icon?: string
-  children?: MenuItem[]
+  label: string
+  icon?: LucideIcon
   path?: string
+  badge?: string
+  children?: MenuItem[]
 }
 
 const menuStructure: MenuItem[] = [
   {
-    id: 'desktop',
-    name: 'Рабочий стол',
-    icon: 'desktop',
+    id: 'dashboard',
+    label: 'Обзор',
+    icon: LayoutDashboard,
     path: '/dashboard'
   },
   {
-    id: 'sales',
-    name: 'Продажи',
-    icon: 'sales',
+    id: 'commerce',
+    label: 'Продажи и каталог',
+    icon: ShoppingBag,
     children: [
-      { id: 'orders', name: 'Заказы покупателей', path: '/orders' },
-      { id: 'sales-reports', name: 'Отчеты по продажам', path: '/sales-reports' },
-      { id: 'returns', name: 'Возвраты товаров', path: '/returns' }
+      { id: 'orders', label: 'Заказы', icon: ShoppingCart, path: '/orders' },
+      { id: 'products', label: 'Товары', icon: Package, path: '/products' },
+      { id: 'marketplaces', label: 'Маркетплейсы', icon: Store, path: '/marketplaces' }
     ]
   },
   {
-    id: 'products',
-    name: 'Товары и услуги',
-    icon: 'products',
+    id: 'analytics',
+    label: 'Аналитика',
+    icon: LineChart,
     children: [
-      { id: 'nomenclature', name: 'Номенклатура', path: '/products' },
-      { id: 'inventory', name: 'Остатки товаров', path: '/inventory' },
-      { id: 'prices', name: 'Цены номенклатуры', path: '/prices' },
-      { id: 'categories', name: 'Группы номенклатуры', path: '/categories' }
-    ]
-  },
-  {
-    id: 'reports',
-    name: 'Отчеты',
-    icon: 'reports',
-    children: [
-      { id: 'analytics', name: 'Анализ продаж', path: '/analytics' },
-      { id: 'abc-analysis', name: 'ABC анализ', path: '/abc-analysis' },
-      { id: 'turnover', name: 'Оборачиваемость', path: '/turnover' },
-      { id: 'profitability', name: 'Рентабельность', path: '/profitability' }
+      { id: 'analytics-overview', label: 'Показатели', icon: LineChart, path: '/analytics' },
+      { id: 'advertising', label: 'Реклама', icon: Megaphone, path: '/advertising', badge: 'новое' }
     ]
   },
   {
     id: 'finance',
-    name: 'Деньги',
-    icon: 'finance',
-    children: [
-      { id: 'cash-flow', name: 'Движение денежных средств', path: '/finance' },
-      { id: 'settlements', name: 'Взаиморасчеты', path: '/settlements' },
-      { id: 'bank-operations', name: 'Банковские операции', path: '/bank-operations' }
-    ]
+    label: 'Финансы',
+    icon: Wallet,
+    path: '/finance'
   },
   {
-    id: 'marketing',
-    name: 'Маркетинг',
-    icon: 'marketing',
-    children: [
-      { id: 'advertising', name: 'Рекламные кампании', path: '/advertising' },
-      { id: 'promotions', name: 'Акции и скидки', path: '/promotions' },
-      { id: 'loyalty', name: 'Программы лояльности', path: '/loyalty' }
-    ]
+    id: 'team',
+    label: 'Команда и роли',
+    icon: Users,
+    badge: 'скоро'
   },
   {
-    id: 'references',
-    name: 'Справочники',
-    icon: 'references',
-    children: [
-      { id: 'marketplaces', name: 'Маркетплейсы', path: '/marketplaces' },
-      { id: 'counterparties', name: 'Контрагенты', path: '/counterparties' },
-      { id: 'warehouses', name: 'Склады', path: '/warehouses' },
-      { id: 'currencies', name: 'Валюты', path: '/currencies' }
-    ]
-  },
-  {
-    id: 'administration',
-    name: 'Администрирование',
-    icon: 'administration',
-    children: [
-      { id: 'settings', name: 'Настройки', path: '/settings' },
-      { id: 'users', name: 'Пользователи', path: '/users' },
-      { id: 'backup', name: 'Резервное копирование', path: '/backup' },
-      { id: 'logs', name: 'Журнал событий', path: '/logs' }
-    ]
+    id: 'settings',
+    label: 'Настройки',
+    icon: Settings,
+    path: '/settings'
   }
 ]
 
-interface Layout1CProps {
+const pageDescriptions: Record<string, string> = {
+  '/dashboard': 'Сводная панель с ключевыми метриками по продажам, остаткам и рекламным кампаниям на всех площадках.',
+  '/orders': 'Управляйте заказами с маркетплейсов, отслеживайте статусы и контролируйте SLA-коммуникации.',
+  '/products': 'Синхронизируйте каталог, обновляйте цены и остатки, следите за качеством карточек товаров.',
+  '/analytics': 'Получайте отчетность по каналам продаж, разбивку по площадкам и выявляйте точки роста.',
+  '/advertising': 'Контролируйте рекламные кампании, бюджеты и эффективность размещений на маркетплейсах.',
+  '/finance': 'Анализируйте денежный поток, выплаты от площадок и маржинальность в разрезе SKU.',
+  '/marketplaces': 'Управляйте подключениями маркетплейсов и настройками синхронизации данных.',
+  '/settings': 'Настраивайте доступы команды, интеграции и системные параметры MarketPro.'
+}
+
+type FindResult = { item: MenuItem; parents: MenuItem[] }
+
+const findItemByPath = (items: MenuItem[], path: string, parents: MenuItem[] = []): FindResult | null => {
+  for (const item of items) {
+    if (item.path === path) {
+      return { item, parents }
+    }
+
+    if (item.children) {
+      const match = findItemByPath(item.children, path, [...parents, item])
+      if (match) {
+        return match
+      }
+    }
+  }
+
+  return null
+}
+
+interface LayoutProps {
   children: React.ReactNode
 }
 
-export default function Layout1C({ children }: Layout1CProps) {
-  const [expandedNodes, setExpandedNodes] = useState<string[]>(['sales', 'products', 'reports'])
-  const [selectedNode, setSelectedNode] = useState<string>('desktop')
+export default function Layout1C({ children }: LayoutProps) {
   const location = useLocation()
   const navigate = useNavigate()
   const { user, logout } = useAuth()
+  const { theme, toggleTheme } = useTheme()
 
-  const toggleNode = (nodeId: string) => {
-    setExpandedNodes(prev => 
-      prev.includes(nodeId) 
-        ? prev.filter(id => id !== nodeId)
-        : [...prev, nodeId]
+  const [expandedNodes, setExpandedNodes] = useState<string[]>(() =>
+    menuStructure.filter(item => item.children).map(item => item.id)
+  )
+  const [selectedNode, setSelectedNode] = useState<string>('dashboard')
+  const [sidebarOpen, setSidebarOpen] = useState(false)
+
+  useEffect(() => {
+    const match = findItemByPath(menuStructure, location.pathname)
+
+    if (match) {
+      setSelectedNode(match.item.id)
+      if (match.parents.length) {
+        setExpandedNodes(prev => {
+          const next = new Set(prev)
+          match.parents.forEach(parent => next.add(parent.id))
+          return Array.from(next)
+        })
+      }
+    }
+  }, [location.pathname])
+
+  useEffect(() => {
+    setSidebarOpen(false)
+  }, [location.pathname])
+
+  const currentSubtitle = useMemo(
+    () => pageDescriptions[location.pathname] || 'Управляйте маркетплейсами, продажами и рекламой из единого окна.',
+    [location.pathname]
+  )
+
+  const currentTitle = useMemo(() => {
+    const match = findItemByPath(menuStructure, location.pathname)
+    return match?.item.label ?? 'MarketPro'
+  }, [location.pathname])
+
+  const toggleSection = (id: string) => {
+    setExpandedNodes(prev =>
+      prev.includes(id) ? prev.filter(itemId => itemId !== id) : [...prev, id]
     )
   }
 
-  const selectNode = (nodeId: string, path?: string) => {
-    setSelectedNode(nodeId)
-    if (path) {
-      navigate(path)
-    }
+  const handleNavigate = (item: MenuItem) => {
+    if (!item.path) return
+    setSelectedNode(item.id)
+    navigate(item.path)
   }
 
-  const handleLogout = () => {
-    logout()
-    navigate('/login')
-  }
-
-  const renderTreeNode = (item: MenuItem, level: number = 0) => {
-    const isExpanded = expandedNodes.includes(item.id)
-    const isSelected = selectedNode === item.id || location.pathname === item.path
-    const hasChildren = item.children && item.children.length > 0
+  const renderSubItem = (item: MenuItem) => {
+    const Icon = item.icon
+    const isActive = location.pathname === item.path || selectedNode === item.id
 
     return (
-      <div key={item.id}>
-        <div 
-          className={`tree-node ${isSelected ? 'selected' : ''}`}
-          style={{ paddingLeft: `${level * 16 + 4}px` }}
-          onClick={() => selectNode(item.id, item.path)}
-        >
-          {hasChildren && (
-            <div 
-              className={`tree-node-expand ${isExpanded ? 'expanded' : ''}`}
-              onClick={(e) => {
-                e.stopPropagation()
-                toggleNode(item.id)
-              }}
-            />
-          )}
-          <div className={`tree-node-icon icon-${item.icon || 'folder'}`} />
-          <span>{item.name}</span>
+      <button
+        key={item.id}
+        className={`nav-subitem ${isActive ? 'active' : ''}`}
+        onClick={() => handleNavigate(item)}
+      >
+        {Icon && <Icon className="nav-subitem-icon" />}
+        <span>{item.label}</span>
+        {item.badge && <span className="nav-badge">{item.badge}</span>}
+      </button>
+    )
+  }
+
+  const renderMenuItem = (item: MenuItem) => {
+    const Icon = item.icon
+    const isExpanded = expandedNodes.includes(item.id)
+    const isActive = selectedNode === item.id || location.pathname === item.path
+
+    if (item.children) {
+      return (
+        <div key={item.id} className="nav-item">
+          <button
+            className={`nav-trigger ${isActive ? 'active' : ''}`}
+            onClick={() => toggleSection(item.id)}
+            aria-expanded={isExpanded}
+          >
+            <span className="nav-trigger-label">
+              {Icon && <Icon className="nav-trigger-icon" />}
+              <span>{item.label}</span>
+            </span>
+            <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+              {item.badge && <span className="nav-badge">{item.badge}</span>}
+              <ChevronDown className={`nav-trigger-chevron ${isExpanded ? 'expanded' : ''}`} />
+            </div>
+          </button>
+          {isExpanded && <div className="nav-submenu">{item.children.map(renderSubItem)}</div>}
         </div>
-        {hasChildren && isExpanded && (
-          <div className="tree-node-children">
-            {item.children!.map(child => renderTreeNode(child, level + 1))}
-          </div>
-        )}
+      )
+    }
+
+    return (
+      <div key={item.id} className="nav-item">
+        <button
+          className={`nav-trigger ${isActive ? 'active' : ''}`}
+          onClick={() => handleNavigate(item)}
+          aria-current={isActive ? 'page' : undefined}
+        >
+          <span className="nav-trigger-label">
+            {Icon && <Icon className="nav-trigger-icon" />}
+            <span>{item.label}</span>
+          </span>
+          {item.badge && <span className="nav-badge">{item.badge}</span>}
+        </button>
       </div>
     )
   }
 
-  const getCurrentPageTitle = () => {
-    const findTitle = (items: MenuItem[]): string => {
-      for (const item of items) {
-        if (item.path === location.pathname) {
-          return item.name
-        }
-        if (item.children) {
-          const childTitle = findTitle(item.children)
-          if (childTitle) return childTitle
-        }
-      }
-      return 'Рабочий стол'
-    }
-    return findTitle(menuStructure)
-  }
+  const userDisplayName = user?.username || user?.email || 'Пользователь'
+  const userInitials = useMemo(() => {
+    if (!userDisplayName) return 'MP'
+    const parts = userDisplayName.split(/[\s@._-]+/).filter(Boolean)
+    const initials = parts.slice(0, 2).map(part => part.charAt(0).toUpperCase()).join('')
+    return initials || userDisplayName.charAt(0).toUpperCase()
+  }, [userDisplayName])
 
   return (
-    <div className="app-container">
-      {/* Главное меню */}
-      <div className="main-menu">
-        <div className="menu-item" onClick={() => navigate('/dashboard')}>Файл</div>
-        <div className="menu-item">Правка</div>
-        <div className="menu-item">Вид</div>
-        <div className="menu-item">Операции</div>
-        <div className="menu-item">Отчеты</div>
-        <div className="menu-item" onClick={() => navigate('/settings')}>Сервис</div>
-        <div className="menu-item">Окно</div>
-        <div className="menu-item">Справка</div>
-        <div style={{ marginLeft: 'auto', display: 'flex', alignItems: 'center', gap: '8px' }}>
-          <span style={{ fontSize: '10px', color: 'var(--1c-text-secondary)' }}>
-            {user?.username || user?.email}
-          </span>
-          <div className="menu-item" onClick={handleLogout}>Выход</div>
-        </div>
-      </div>
+    <div className="layout-shell">
+      {sidebarOpen && <div className="sidebar-backdrop" onClick={() => setSidebarOpen(false)} />}
 
-      {/* Панель инструментов */}
-      <div className="toolbar">
-        <button className="toolbar-button">
-          <span className="icon-1c icon-document"></span>
-          Создать
-        </button>
-        <button className="toolbar-button">
-          <span className="icon-1c icon-folder"></span>
-          Открыть
-        </button>
-        <button className="toolbar-button">
-          <span className="icon-1c icon-table"></span>
-          Записать
-        </button>
-        <div className="toolbar-separator"></div>
-        <button className="toolbar-button">
-          <span className="icon-1c icon-document"></span>
-          Копировать
-        </button>
-        <button className="toolbar-button">
-          <span className="icon-1c icon-document"></span>
-          Вставить
-        </button>
-        <div className="toolbar-separator"></div>
-        <button className="toolbar-button">
-          <span className="icon-1c icon-table"></span>
-          Найти
-        </button>
-        <button className="toolbar-button">
-          <span className="icon-1c icon-document"></span>
-          Печать
-        </button>
-        <div className="toolbar-separator"></div>
-        <button className="toolbar-button">
-          <span className="icon-1c icon-folder"></span>
-          Обновить
-        </button>
-      </div>
-
-      {/* Основная рабочая область */}
-      <div className="main-content">
-        {/* Левая панель навигации */}
-        <div className="navigation-panel">
-          <div className="navigation-header">
-            Конфигурация
-          </div>
-          <div className="navigation-tree">
-            {menuStructure.map(item => renderTreeNode(item))}
+      <aside className={`sidebar ${sidebarOpen ? 'open' : ''}`}>
+        <div className="sidebar-header">
+          <div className="sidebar-logo">MP</div>
+          <div className="sidebar-title">
+            <span>MarketPro</span>
+            <span>Unified Commerce Hub</span>
           </div>
         </div>
 
-        {/* Рабочая область */}
-        <div className="work-area">
-          <div className="work-area-header">
-            <div className="work-area-title">{getCurrentPageTitle()}</div>
-            <div style={{ display: 'flex', gap: '4px' }}>
-              <button className="button-1c">Действия</button>
-              <button className="button-1c">Печать</button>
-              <button className="button-1c">Еще</button>
+        <div className="sidebar-section">
+          <span className="sidebar-section-label">Навигация</span>
+          {menuStructure.map(renderMenuItem)}
+        </div>
+
+        <div className="sidebar-footer">
+          <span>Все данные синхронизированы</span>
+          <span style={{ color: 'var(--text-tertiary)' }}>Обновлено {new Date().toLocaleTimeString('ru-RU', { hour: '2-digit', minute: '2-digit' })}</span>
+        </div>
+      </aside>
+
+      <div className="layout-main">
+        <header className="topbar">
+          <div className="topbar-left">
+            <button
+              className="icon-button mobile-toggle"
+              onClick={() => setSidebarOpen(prev => !prev)}
+              aria-label="Открыть меню"
+            >
+              <Menu size={18} />
+            </button>
+
+            <div className="search-box">
+              <Search className="search-icon" size={16} />
+              <input type="search" placeholder="Поиск по товарам, заказам или отчётам" />
             </div>
           </div>
-          <div className="work-area-content">
-            {children}
-          </div>
-        </div>
-      </div>
 
-      {/* Статусная строка */}
-      <div className="status-bar">
-        <div className="status-item">
-          <span>Готов</span>
-        </div>
-        <div className="status-item">
-          <span>MarketPro v1.0</span>
-        </div>
-        <div className="status-item">
-          <span>{new Date().toLocaleString('ru-RU')}</span>
-        </div>
+          <div className="topbar-actions">
+            <button
+              className="icon-button"
+              onClick={toggleTheme}
+              aria-label={theme === 'dark' ? 'Включить светлую тему' : 'Включить тёмную тему'}
+            >
+              {theme === 'dark' ? <Sun size={18} /> : <Moon size={18} />}
+            </button>
+            <button className="icon-button" aria-label="Уведомления">
+              <Bell size={18} />
+            </button>
+            <div className="user-chip">
+              <div className="user-avatar">{userInitials}</div>
+              <div style={{ display: 'flex', flexDirection: 'column', lineHeight: 1 }}>
+                <span style={{ fontSize: '14px', color: 'var(--text-primary)', fontWeight: 600 }}>{userDisplayName}</span>
+                <span style={{ fontSize: '12px', color: 'var(--text-tertiary)' }}>Администратор</span>
+              </div>
+            </div>
+            <button className="logout-button" onClick={logout}>
+              <LogOut size={16} />
+              <span>Выйти</span>
+            </button>
+          </div>
+        </header>
+
+        <main className="page-content-wrapper">
+          <section className="page-header">
+            <div className="page-header-top">
+              <div>
+                <h1 className="page-title">{currentTitle}</h1>
+                <p className="page-subtitle">{currentSubtitle}</p>
+              </div>
+              <div className="page-actions">
+                <button className="page-action-button">
+                  <Sparkles size={16} />
+                  <span>Быстрый отчёт</span>
+                </button>
+                <button className="page-action-button secondary">
+                  <ShoppingBag size={16} />
+                  <span>Новая синхронизация</span>
+                </button>
+              </div>
+            </div>
+          </section>
+
+          <div className="page-body">{children}</div>
+        </main>
       </div>
     </div>
   )

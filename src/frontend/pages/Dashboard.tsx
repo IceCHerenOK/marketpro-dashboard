@@ -1,169 +1,88 @@
-import React, { useState } from 'react'
+import React, { useEffect, useState } from 'react'
+import { api } from '../utils/api'
 import {
-  ChartBarIcon,
   CurrencyDollarIcon,
   ShoppingCartIcon,
   CubeIcon,
+  ChartBarIcon,
   ArrowUpIcon,
   ArrowDownIcon,
-  EyeIcon,
-  PencilIcon,
-  TrashIcon,
-  PlusIcon,
-  FunnelIcon,
-  MagnifyingGlassIcon,
-  CalendarIcon,
-  ArrowPathIcon,
-  DocumentArrowDownIcon,
-  ChevronRightIcon,
-  ExclamationTriangleIcon,
   CheckCircleIcon,
   ClockIcon,
-  XCircleIcon
+  ExclamationTriangleIcon,
+  XCircleIcon,
+  ArrowPathIcon
 } from '@heroicons/react/24/outline'
 
-interface StatCard {
-  title: string
-  value: string
-  change: number
-  icon: React.ComponentType<any>
-  color: string
+interface Summary {
+  revenue: number
+  ordersCount: number
+  avgOrderValue: number
+  conversionRate: number
 }
 
 interface Order {
-  id: string
-  number: string
-  date: string
-  customer: string
-  amount: number
-  status: 'new' | 'processing' | 'shipped' | 'delivered' | 'cancelled'
+  id: number
+  externalId: string
+  createdAt: string
+  customerName?: string
+  totalAmount: number
+  status: string
   marketplace: string
 }
 
 interface Product {
-  id: string
+  id: number
   name: string
-  sku: string
+  sku?: string
   price: number
-  stock: number
-  sales: number
+  stockQuantity: number
   marketplace: string
+  status: string
 }
 
 export default function Dashboard() {
-  const [selectedPeriod, setSelectedPeriod] = useState('today')
-  const [searchQuery, setSearchQuery] = useState('')
+  const [summary, setSummary] = useState<Summary>({
+    revenue: 0,
+    ordersCount: 0,
+    avgOrderValue: 0,
+    conversionRate: 0
+  })
+  const [orders, setOrders] = useState<Order[]>([])
+  const [products, setProducts] = useState<Product[]>([])
+  const [loading, setLoading] = useState(true)
+  const [error, setError] = useState<string | null>(null)
 
-  const stats: StatCard[] = [
-    {
-      title: 'Выручка за сегодня',
-      value: '₽ 245 890',
-      change: 12.5,
-      icon: CurrencyDollarIcon,
-      color: 'bg-green-500'
-    },
-    {
-      title: 'Заказы',
-      value: '127',
-      change: 8.3,
-      icon: ShoppingCartIcon,
-      color: 'bg-blue-500'
-    },
-    {
-      title: 'Товары в продаже',
-      value: '1 234',
-      change: -2.1,
-      icon: CubeIcon,
-      color: 'bg-purple-500'
-    },
-    {
-      title: 'Средний чек',
-      value: '₽ 1 937',
-      change: 5.7,
-      icon: ChartBarIcon,
-      color: 'bg-orange-500'
+  useEffect(() => {
+    loadDashboard()
+  }, [])
+
+  const loadDashboard = async () => {
+    try {
+      setLoading(true)
+      setError(null)
+
+      const [summaryRes, ordersRes, productsRes] = await Promise.all([
+        api.analytics.getSummary(),
+        api.orders.getAll({ limit: 5 }),
+        api.products.getAll({ limit: 3 })
+      ])
+
+      setSummary(summaryRes)
+      setOrders(ordersRes.orders || [])
+      setProducts(productsRes.products || [])
+    } catch (err) {
+      console.error('Ошибка загрузки дашборда:', err)
+      setError('Не удалось загрузить данные панели')
+    } finally {
+      setLoading(false)
     }
-  ]
+  }
 
-  const recentOrders: Order[] = [
-    {
-      id: '1',
-      number: '000000123',
-      date: '21.07.2025 14:30',
-      customer: 'Иванов Иван Иванович',
-      amount: 3450,
-      status: 'new',
-      marketplace: 'Wildberries'
-    },
-    {
-      id: '2',
-      number: '000000124',
-      date: '21.07.2025 13:15',
-      customer: 'Петрова Анна Сергеевна',
-      amount: 1890,
-      status: 'processing',
-      marketplace: 'OZON'
-    },
-    {
-      id: '3',
-      number: '000000125',
-      date: '21.07.2025 12:45',
-      customer: 'Сидоров Петр Александрович',
-      amount: 5670,
-      status: 'shipped',
-      marketplace: 'Яндекс Маркет'
-    },
-    {
-      id: '4',
-      number: '000000126',
-      date: '21.07.2025 11:20',
-      customer: 'Козлова Мария Викторовна',
-      amount: 2340,
-      status: 'delivered',
-      marketplace: 'Wildberries'
-    },
-    {
-      id: '5',
-      number: '000000127',
-      date: '21.07.2025 10:10',
-      customer: 'Морозов Алексей Дмитриевич',
-      amount: 4120,
-      status: 'cancelled',
-      marketplace: 'OZON'
-    }
-  ]
+  const formatCurrency = (value: number) =>
+    new Intl.NumberFormat('ru-RU', { style: 'currency', currency: 'RUB' }).format(value || 0)
 
-  const topProducts: Product[] = [
-    {
-      id: '1',
-      name: 'Смартфон Samsung Galaxy A54 5G 128GB',
-      sku: 'SM-A546B',
-      price: 24990,
-      stock: 45,
-      sales: 23,
-      marketplace: 'Wildberries'
-    },
-    {
-      id: '2',
-      name: 'Наушники Apple AirPods Pro 2-го поколения',
-      sku: 'MTJV3',
-      price: 19990,
-      stock: 12,
-      sales: 18,
-      marketplace: 'OZON'
-    },
-    {
-      id: '3',
-      name: 'Ноутбук ASUS VivoBook 15 X1500EA',
-      sku: 'X1500EA-BQ2491',
-      price: 45990,
-      stock: 8,
-      sales: 12,
-      marketplace: 'Яндекс Маркет'
-    }
-  ]
-
-  const getStatusIcon = (status: Order['status']) => {
+  const getStatusIcon = (status: string) => {
     switch (status) {
       case 'new':
         return <ExclamationTriangleIcon className="h-4 w-4 text-yellow-500" />
@@ -180,294 +99,155 @@ export default function Dashboard() {
     }
   }
 
-  const getStatusText = (status: Order['status']) => {
-    switch (status) {
-      case 'new':
-        return 'Новый'
-      case 'processing':
-        return 'В обработке'
-      case 'shipped':
-        return 'Отправлен'
-      case 'delivered':
-        return 'Доставлен'
-      case 'cancelled':
-        return 'Отменен'
-      default:
-        return status
+  const getStatusText = (status: string) => {
+    const map: Record<string, string> = {
+      new: 'Новый',
+      processing: 'В обработке',
+      shipped: 'Отправлен',
+      delivered: 'Доставлен',
+      cancelled: 'Отменен'
     }
+    return map[status] || status
   }
 
-  const getStatusColor = (status: Order['status']) => {
-    switch (status) {
-      case 'new':
-        return 'bg-yellow-100 text-yellow-800 border-yellow-200'
-      case 'processing':
-        return 'bg-blue-100 text-blue-800 border-blue-200'
-      case 'shipped':
-        return 'bg-purple-100 text-purple-800 border-purple-200'
-      case 'delivered':
-        return 'bg-green-100 text-green-800 border-green-200'
-      case 'cancelled':
-        return 'bg-red-100 text-red-800 border-red-200'
-      default:
-        return 'bg-gray-100 text-gray-800 border-gray-200'
-    }
+  if (loading) {
+    return (
+      <div className="flex items-center justify-center h-64">
+        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600"></div>
+      </div>
+    )
   }
 
   return (
     <div className="space-y-6">
-      {/* Заголовок страницы */}
-      <div className="flex items-center justify-between">
-        <div>
-          <h1 className="text-2xl font-bold text-gray-900">Рабочий стол</h1>
-          <p className="text-sm text-gray-600 mt-1">
-            Обзор основных показателей и последних операций
-          </p>
-        </div>
-        <div className="flex items-center space-x-3">
-          <select
-            value={selectedPeriod}
-            onChange={(e) => setSelectedPeriod(e.target.value)}
-            className="border border-gray-300 rounded-md px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
-          >
-            <option value="today">Сегодня</option>
-            <option value="week">Неделя</option>
-            <option value="month">Месяц</option>
-            <option value="quarter">Квартал</option>
-          </select>
-          <button className="inline-flex items-center px-3 py-2 border border-gray-300 rounded-md text-sm font-medium text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-blue-500">
-            <ArrowPathIcon className="h-4 w-4 mr-2" />
-            Обновить
-          </button>
-        </div>
+      <div>
+        <h1 className="text-2xl font-bold text-gray-900">Обзор</h1>
+        <p className="text-gray-600">Ключевые показатели по продажам и остаткам</p>
       </div>
 
-      {/* Карточки статистики */}
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-        {stats.map((stat, index) => (
-          <div key={index} className="bg-white border border-gray-200 rounded-lg p-6 shadow-sm">
-            <div className="flex items-center justify-between">
-              <div className="flex items-center">
-                <div className={`${stat.color} p-3 rounded-lg`}>
-                  <stat.icon className="h-6 w-6 text-white" />
-                </div>
-                <div className="ml-4">
-                  <p className="text-sm font-medium text-gray-600">{stat.title}</p>
-                  <p className="text-2xl font-bold text-gray-900">{stat.value}</p>
-                </div>
-              </div>
-              <div className={`flex items-center text-sm ${
-                stat.change >= 0 ? 'text-green-600' : 'text-red-600'
-              }`}>
-                {stat.change >= 0 ? (
-                  <ArrowUpIcon className="h-4 w-4 mr-1" />
-                ) : (
-                  <ArrowDownIcon className="h-4 w-4 mr-1" />
-                )}
-                {Math.abs(stat.change)}%
-              </div>
-            </div>
-          </div>
-        ))}
-      </div>
+      {error && (
+        <div className="p-4 rounded-lg bg-red-50 text-red-700 mb-4">
+          {error}
+        </div>
+      )}
 
-      <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-        {/* Последние заказы */}
-        <div className="lg:col-span-2">
-          <div className="bg-white border border-gray-200 rounded-lg shadow-sm">
-            <div className="px-6 py-4 border-b border-gray-200">
-              <div className="flex items-center justify-between">
-                <h2 className="text-lg font-semibold text-gray-900">Заказы покупателей</h2>
-                <div className="flex items-center space-x-2">
-                  <div className="relative">
-                    <MagnifyingGlassIcon className="h-4 w-4 absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400" />
-                    <input
-                      type="text"
-                      placeholder="Поиск заказов..."
-                      value={searchQuery}
-                      onChange={(e) => setSearchQuery(e.target.value)}
-                      className="pl-9 pr-3 py-1.5 border border-gray-300 rounded-md text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
-                    />
-                  </div>
-                  <button className="inline-flex items-center px-3 py-1.5 border border-gray-300 rounded-md text-sm font-medium text-gray-700 bg-white hover:bg-gray-50">
-                    <FunnelIcon className="h-4 w-4 mr-1" />
-                    Фильтр
-                  </button>
-                  <button className="inline-flex items-center px-3 py-1.5 bg-blue-600 text-white rounded-md text-sm font-medium hover:bg-blue-700">
-                    <PlusIcon className="h-4 w-4 mr-1" />
-                    Создать
-                  </button>
-                </div>
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+        <div className="card">
+          <div className="flex items-center justify-between">
+            <div>
+              <p className="text-sm text-gray-500">Выручка</p>
+              <p className="text-2xl font-bold text-gray-900">{formatCurrency(summary.revenue)}</p>
+              <div className="flex items-center text-sm text-green-600">
+                <ArrowUpIcon className="h-4 w-4 mr-1" />
+                в сравнении с прошлым периодом
               </div>
             </div>
-            
-            <div className="overflow-x-auto">
-              <table className="min-w-full divide-y divide-gray-200">
-                <thead className="bg-gray-50">
-                  <tr>
-                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                      Номер
-                    </th>
-                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                      Дата
-                    </th>
-                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                      Покупатель
-                    </th>
-                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                      Сумма
-                    </th>
-                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                      Статус
-                    </th>
-                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                      Маркетплейс
-                    </th>
-                    <th className="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">
-                      Действия
-                    </th>
-                  </tr>
-                </thead>
-                <tbody className="bg-white divide-y divide-gray-200">
-                  {recentOrders.map((order) => (
-                    <tr key={order.id} className="hover:bg-gray-50">
-                      <td className="px-6 py-4 whitespace-nowrap">
-                        <div className="text-sm font-medium text-blue-600 hover:text-blue-800 cursor-pointer">
-                          {order.number}
-                        </div>
-                      </td>
-                      <td className="px-6 py-4 whitespace-nowrap">
-                        <div className="text-sm text-gray-900">{order.date}</div>
-                      </td>
-                      <td className="px-6 py-4 whitespace-nowrap">
-                        <div className="text-sm text-gray-900">{order.customer}</div>
-                      </td>
-                      <td className="px-6 py-4 whitespace-nowrap">
-                        <div className="text-sm font-medium text-gray-900">
-                          {order.amount.toLocaleString('ru-RU', { style: 'currency', currency: 'RUB' })}
-                        </div>
-                      </td>
-                      <td className="px-6 py-4 whitespace-nowrap">
-                        <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium border ${getStatusColor(order.status)}`}>
-                          {getStatusIcon(order.status)}
-                          <span className="ml-1">{getStatusText(order.status)}</span>
-                        </span>
-                      </td>
-                      <td className="px-6 py-4 whitespace-nowrap">
-                        <div className="text-sm text-gray-900">{order.marketplace}</div>
-                      </td>
-                      <td className="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
-                        <div className="flex items-center justify-end space-x-2">
-                          <button className="text-blue-600 hover:text-blue-900">
-                            <EyeIcon className="h-4 w-4" />
-                          </button>
-                          <button className="text-gray-600 hover:text-gray-900">
-                            <PencilIcon className="h-4 w-4" />
-                          </button>
-                        </div>
-                      </td>
-                    </tr>
-                  ))}
-                </tbody>
-              </table>
-            </div>
-            
-            <div className="px-6 py-3 border-t border-gray-200 bg-gray-50">
-              <div className="flex items-center justify-between">
-                <div className="text-sm text-gray-700">
-                  Показано 5 из 127 записей
-                </div>
-                <button className="inline-flex items-center text-sm text-blue-600 hover:text-blue-800 font-medium">
-                  Показать все заказы
-                  <ChevronRightIcon className="h-4 w-4 ml-1" />
-                </button>
-              </div>
+            <div className="bg-green-100 p-3 rounded-full">
+              <CurrencyDollarIcon className="h-6 w-6 text-green-600" />
             </div>
           </div>
         </div>
-
-        {/* Популярные товары */}
-        <div className="lg:col-span-1">
-          <div className="bg-white border border-gray-200 rounded-lg shadow-sm">
-            <div className="px-6 py-4 border-b border-gray-200">
-              <div className="flex items-center justify-between">
-                <h2 className="text-lg font-semibold text-gray-900">Популярные товары</h2>
-                <button className="text-sm text-blue-600 hover:text-blue-800 font-medium">
-                  Все товары
-                </button>
+        <div className="card">
+          <div className="flex items-center justify-between">
+            <div>
+              <p className="text-sm text-gray-500">Количество заказов</p>
+              <p className="text-2xl font-bold text-gray-900">{summary.ordersCount}</p>
+              <div className="flex items-center text-sm text-blue-600">
+                <ArrowUpIcon className="h-4 w-4 mr-1" />
+                обновлено автоматически
               </div>
             </div>
-            
-            <div className="p-6 space-y-4">
-              {topProducts.map((product) => (
-                <div key={product.id} className="flex items-center justify-between p-3 bg-gray-50 rounded-lg">
-                  <div className="flex-1 min-w-0">
-                    <p className="text-sm font-medium text-gray-900 truncate">
-                      {product.name}
+            <div className="bg-blue-100 p-3 rounded-full">
+              <ShoppingCartIcon className="h-6 w-6 text-blue-600" />
+            </div>
+          </div>
+        </div>
+        <div className="card">
+          <div className="flex items-center justify-between">
+            <div>
+              <p className="text-sm text-gray-500">Средний чек</p>
+              <p className="text-2xl font-bold text-gray-900">{formatCurrency(summary.avgOrderValue)}</p>
+              <div className="flex items-center text-sm text-gray-500">
+                <ArrowDownIcon className="h-4 w-4 mr-1" />
+                рассчитывается по заказам
+              </div>
+            </div>
+            <div className="bg-purple-100 p-3 rounded-full">
+              <CubeIcon className="h-6 w-6 text-purple-600" />
+            </div>
+          </div>
+        </div>
+        <div className="card">
+          <div className="flex items-center justify-between">
+            <div>
+              <p className="text-sm text-gray-500">Конверсия</p>
+              <p className="text-2xl font-bold text-gray-900">{summary.conversionRate.toFixed(2)}%</p>
+              <div className="flex items-center text-sm text-gray-500">
+                <ChartBarIcon className="h-4 w-4 mr-1" />
+                новые данные появятся после интеграции
+              </div>
+            </div>
+            <div className="bg-orange-100 p-3 rounded-full">
+              <ChartBarIcon className="h-6 w-6 text-orange-600" />
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+        <div className="card">
+          <div className="flex items-center justify-between mb-4">
+            <h3 className="text-lg font-semibold text-gray-900">Недавние заказы</h3>
+          </div>
+          {orders.length === 0 ? (
+            <div className="text-center py-8 text-gray-500">Заказы не найдены</div>
+          ) : (
+            <div className="space-y-4">
+              {orders.map(order => (
+                <div key={order.id} className="flex items-center justify-between">
+                  <div>
+                    <p className="font-medium text-gray-900">{order.externalId}</p>
+                    <p className="text-sm text-gray-500">
+                      {new Date(order.createdAt).toLocaleString('ru-RU')} · {order.marketplace}
                     </p>
-                    <div className="flex items-center mt-1 space-x-4">
-                      <span className="text-xs text-gray-500">
-                        Артикул: {product.sku}
-                      </span>
-                      <span className="text-xs text-gray-500">
-                        Остаток: {product.stock}
-                      </span>
-                    </div>
-                    <div className="flex items-center justify-between mt-2">
-                      <span className="text-sm font-medium text-gray-900">
-                        {product.price.toLocaleString('ru-RU', { style: 'currency', currency: 'RUB' })}
-                      </span>
-                      <span className="text-xs text-green-600 font-medium">
-                        Продано: {product.sales}
-                      </span>
+                  </div>
+                  <div className="text-right">
+                    <p className="font-semibold text-gray-900">{formatCurrency(order.totalAmount)}</p>
+                    <div className="flex items-center justify-end text-sm text-gray-500">
+                      {getStatusIcon(order.status)}
+                      <span className="ml-2">{getStatusText(order.status)}</span>
                     </div>
                   </div>
                 </div>
               ))}
             </div>
-            
-            <div className="px-6 py-3 border-t border-gray-200 bg-gray-50">
-              <button className="w-full inline-flex items-center justify-center text-sm text-blue-600 hover:text-blue-800 font-medium">
-                Перейти к номенклатуре
-                <ChevronRightIcon className="h-4 w-4 ml-1" />
-              </button>
-            </div>
-          </div>
+          )}
         </div>
-      </div>
 
-      {/* Быстрые действия */}
-      <div className="bg-white border border-gray-200 rounded-lg shadow-sm">
-        <div className="px-6 py-4 border-b border-gray-200">
-          <h2 className="text-lg font-semibold text-gray-900">Быстрые действия</h2>
-        </div>
-        <div className="p-6">
-          <div className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-6 gap-4">
-            <button className="flex flex-col items-center p-4 border border-gray-200 rounded-lg hover:bg-gray-50 transition-colors">
-              <PlusIcon className="h-8 w-8 text-blue-600 mb-2" />
-              <span className="text-sm font-medium text-gray-900">Новый заказ</span>
-            </button>
-            <button className="flex flex-col items-center p-4 border border-gray-200 rounded-lg hover:bg-gray-50 transition-colors">
-              <CubeIcon className="h-8 w-8 text-green-600 mb-2" />
-              <span className="text-sm font-medium text-gray-900">Добавить товар</span>
-            </button>
-            <button className="flex flex-col items-center p-4 border border-gray-200 rounded-lg hover:bg-gray-50 transition-colors">
-              <ChartBarIcon className="h-8 w-8 text-purple-600 mb-2" />
-              <span className="text-sm font-medium text-gray-900">Отчеты</span>
-            </button>
-            <button className="flex flex-col items-center p-4 border border-gray-200 rounded-lg hover:bg-gray-50 transition-colors">
-              <DocumentArrowDownIcon className="h-8 w-8 text-orange-600 mb-2" />
-              <span className="text-sm font-medium text-gray-900">Экспорт</span>
-            </button>
-            <button className="flex flex-col items-center p-4 border border-gray-200 rounded-lg hover:bg-gray-50 transition-colors">
-              <CalendarIcon className="h-8 w-8 text-red-600 mb-2" />
-              <span className="text-sm font-medium text-gray-900">Планировщик</span>
-            </button>
-            <button className="flex flex-col items-center p-4 border border-gray-200 rounded-lg hover:bg-gray-50 transition-colors">
-              <CurrencyDollarIcon className="h-8 w-8 text-yellow-600 mb-2" />
-              <span className="text-sm font-medium text-gray-900">Финансы</span>
-            </button>
+        <div className="card">
+          <div className="flex items-center justify-between mb-4">
+            <h3 className="text-lg font-semibold text-gray-900">Товары в продаже</h3>
           </div>
+          {products.length === 0 ? (
+            <div className="text-center py-8 text-gray-500">Товары не найдены</div>
+          ) : (
+            <div className="space-y-4">
+              {products.map(product => (
+                <div key={product.id} className="flex items-center justify-between">
+                  <div>
+                    <p className="font-medium text-gray-900">{product.name}</p>
+                    <p className="text-sm text-gray-500">
+                      SKU: {product.sku || '—'} · {product.marketplace}
+                    </p>
+                  </div>
+                  <div className="text-right">
+                    <p className="font-semibold text-gray-900">{formatCurrency(product.price)}</p>
+                    <p className="text-sm text-gray-500">Остаток: {product.stockQuantity}</p>
+                  </div>
+                </div>
+              ))}
+            </div>
+          )}
         </div>
       </div>
     </div>

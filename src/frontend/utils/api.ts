@@ -91,6 +91,10 @@ export const api = {
       const response = await axiosInstance.get(`/marketplaces/${id}/status`);
       return response.data;
     },
+    sync: async (id: string) => {
+      const response = await axiosInstance.post(`/marketplaces/${id}/sync`);
+      return response.data;
+    },
   },
 
   // Заказы
@@ -159,10 +163,18 @@ export const api = {
       const response = await axiosInstance.get('/analytics/products', { params });
       return response.data;
     },
+    getMarketplaceBreakdown: async (params?: any) => {
+      const response = await axiosInstance.get('/analytics/marketplaces', { params });
+      return response.data;
+    },
   },
 
   // Финансы
   finance: {
+    getSummary: async (params?: any) => {
+      const response = await axiosInstance.get('/finance/summary', { params });
+      return response.data;
+    },
     getTransactions: async (params?: any) => {
       const response = await axiosInstance.get('/finance/transactions', { params });
       return response.data;
@@ -181,6 +193,10 @@ export const api = {
   advertising: {
     getCampaigns: async (params?: any) => {
       const response = await axiosInstance.get('/advertising/campaigns', { params });
+      return response.data;
+    },
+    getStats: async (params?: any) => {
+      const response = await axiosInstance.get('/advertising/stats', { params });
       return response.data;
     },
     getCampaignById: async (id: string) => {

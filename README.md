@@ -47,6 +47,9 @@ npm install
 # Запуск веб-версии (frontend + backend)
 npm run dev
 
+# Альтернатива с именованными процессами (реалтайм-лог для backend/frontend)
+npm run dev:live
+
 # Запуск только frontend
 npm run dev:frontend
 

@@ -13,6 +13,7 @@ import productsRoutes from './routes/products';
 import analyticsRoutes from './routes/analytics';
 import financeRoutes from './routes/finance';
 import advertisingRoutes from './routes/advertising';
+import settingsRoutes from './routes/settings';
 
 // Импорт middleware
 import errorHandler from './middleware/errorHandler';
@@ -69,6 +70,7 @@ app.use('/api/products', productsRoutes)
 app.use('/api/analytics', analyticsRoutes)
 app.use('/api/finance', financeRoutes)
 app.use('/api/advertising', advertisingRoutes)
+app.use('/api/settings', settingsRoutes)
 
 // Обработка SPA роутинга
 if (process.env.NODE_ENV !== 'development') {
