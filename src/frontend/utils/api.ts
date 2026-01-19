@@ -9,6 +9,8 @@ const axiosInstance = axios.create({
   },
 });
 
+export { axiosInstance };
+
 // Добавляем перехватчик запросов для добавления токена авторизации
 axiosInstance.interceptors.request.use(
   (config) => {

@@ -1,124 +1,113 @@
-import React, { useState } from 'react'
+import React, { useState } from 'react';
 import {
   CogIcon,
   UserIcon,
   BuildingStorefrontIcon,
-  KeyIcon,
   BellIcon,
   ShieldCheckIcon,
-  DocumentTextIcon,
-  GlobeAltIcon,
   PaintBrushIcon,
   CircleStackIcon,
   CloudArrowUpIcon,
   CheckIcon,
   XMarkIcon,
-  ExclamationTriangleIcon,
-  InformationCircleIcon
-} from '@heroicons/react/24/outline'
+  ExclamationTriangleIcon
+} from '@heroicons/react/24/outline';
 
 interface SettingsTab {
-  id: string
-  name: string
-  icon: React.ComponentType<any>
-  description: string
+  id: string;
+  name: string;
+  icon: React.ComponentType<any>;
+  description: string;
 }
 
 export default function Settings() {
-  const [activeTab, setActiveTab] = useState('general')
+  const [activeTab, setActiveTab] = useState('general');
   const [settings, setSettings] = useState({
-    // Общие настройки
-    companyName: 'ООО "Торговая компания"',
+    companyName: 'ООО "МаркетПро"',
     companyInn: '1234567890',
     companyAddress: 'г. Москва, ул. Примерная, д. 1',
     companyPhone: '+7 (495) 123-45-67',
     companyEmail: 'info@company.ru',
-    
-    // Настройки пользователя
-    userName: 'Администратор',
+
+    userName: 'Александр Администратор',
     userEmail: 'admin@company.ru',
     userPhone: '+7 (999) 123-45-67',
-    
-    // Настройки уведомлений
+
     emailNotifications: true,
     pushNotifications: true,
     smsNotifications: false,
     orderNotifications: true,
     stockNotifications: true,
     priceNotifications: false,
-    
-    // Настройки безопасности
+
     twoFactorAuth: false,
     sessionTimeout: 60,
     passwordExpiry: 90,
-    
-    // Настройки интерфейса
+
     theme: 'light',
     language: 'ru',
     dateFormat: 'dd.mm.yyyy',
     currency: 'RUB',
-    
-    // Настройки интеграций
+
     autoSync: true,
     syncInterval: 15,
-    
-    // Настройки резервного копирования
+
     autoBackup: true,
     backupInterval: 'daily',
     backupRetention: 30
-  })
+  });
 
   const tabs: SettingsTab[] = [
     {
       id: 'general',
       name: 'Общие',
       icon: CogIcon,
-      description: 'Основные настройки системы'
+      description: 'Параметры компании и реквизиты'
     },
     {
       id: 'profile',
       name: 'Профиль',
       icon: UserIcon,
-      description: 'Настройки пользователя'
+      description: 'Данные пользователя и доступ'
     },
     {
       id: 'marketplaces',
       name: 'Маркетплейсы',
       icon: BuildingStorefrontIcon,
-      description: 'Интеграции с маркетплейсами'
+      description: 'Настройки интеграций и синхронизации'
     },
     {
       id: 'notifications',
       name: 'Уведомления',
       icon: BellIcon,
-      description: 'Настройки уведомлений'
+      description: 'Каналы и правила оповещений'
     },
     {
       id: 'security',
       name: 'Безопасность',
       icon: ShieldCheckIcon,
-      description: 'Настройки безопасности'
+      description: 'Защита аккаунта и сессий'
     },
     {
       id: 'interface',
       name: 'Интерфейс',
       icon: PaintBrushIcon,
-      description: 'Настройки внешнего вида'
+      description: 'Язык, валюта и формат дат'
     },
     {
       id: 'backup',
       name: 'Резервные копии',
       icon: CircleStackIcon,
-      description: 'Настройки резервного копирования'
+      description: 'Автосохранение и хранение данных'
     }
-  ]
+  ];
 
   const handleSettingChange = (key: string, value: any) => {
-    setSettings(prev => ({
+    setSettings((prev) => ({
       ...prev,
       [key]: value
-    }))
-  }
+    }));
+  };
 
   const renderGeneralSettings = () => (
     <div className="space-y-6">
@@ -126,9 +115,7 @@ export default function Settings() {
         <h3 className="text-lg font-medium text-gray-900 mb-4">Информация о компании</h3>
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-2">
-              Наименование организации
-            </label>
+            <label className="block text-sm font-medium text-gray-700 mb-2">Название компании</label>
             <input
               type="text"
               value={settings.companyName}
@@ -137,9 +124,7 @@ export default function Settings() {
             />
           </div>
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-2">
-              ИНН
-            </label>
+            <label className="block text-sm font-medium text-gray-700 mb-2">ИНН</label>
             <input
               type="text"
               value={settings.companyInn}
@@ -148,9 +133,7 @@ export default function Settings() {
             />
           </div>
           <div className="md:col-span-2">
-            <label className="block text-sm font-medium text-gray-700 mb-2">
-              Адрес
-            </label>
+            <label className="block text-sm font-medium text-gray-700 mb-2">Адрес</label>
             <input
               type="text"
               value={settings.companyAddress}
@@ -159,9 +142,7 @@ export default function Settings() {
             />
           </div>
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-2">
-              Телефон
-            </label>
+            <label className="block text-sm font-medium text-gray-700 mb-2">Телефон</label>
             <input
               type="tel"
               value={settings.companyPhone}
@@ -170,9 +151,7 @@ export default function Settings() {
             />
           </div>
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-2">
-              Email
-            </label>
+            <label className="block text-sm font-medium text-gray-700 mb-2">Email</label>
             <input
               type="email"
               value={settings.companyEmail}
@@ -183,17 +162,15 @@ export default function Settings() {
         </div>
       </div>
     </div>
-  )
+  );
 
   const renderProfileSettings = () => (
     <div className="space-y-6">
       <div>
-        <h3 className="text-lg font-medium text-gray-900 mb-4">Личная информация</h3>
+        <h3 className="text-lg font-medium text-gray-900 mb-4">Контактные данные</h3>
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-2">
-              Имя пользователя
-            </label>
+            <label className="block text-sm font-medium text-gray-700 mb-2">Имя пользователя</label>
             <input
               type="text"
               value={settings.userName}
@@ -202,9 +179,7 @@ export default function Settings() {
             />
           </div>
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-2">
-              Email
-            </label>
+            <label className="block text-sm font-medium text-gray-700 mb-2">Email</label>
             <input
               type="email"
               value={settings.userEmail}
@@ -213,9 +188,7 @@ export default function Settings() {
             />
           </div>
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-2">
-              Телефон
-            </label>
+            <label className="block text-sm font-medium text-gray-700 mb-2">Телефон</label>
             <input
               type="tel"
               value={settings.userPhone}
@@ -225,32 +198,26 @@ export default function Settings() {
           </div>
         </div>
       </div>
-      
+
       <div>
-        <h3 className="text-lg font-medium text-gray-900 mb-4">Смена пароля</h3>
+        <h3 className="text-lg font-medium text-gray-900 mb-4">Пароль</h3>
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-2">
-              Текущий пароль
-            </label>
+            <label className="block text-sm font-medium text-gray-700 mb-2">Текущий пароль</label>
             <input
               type="password"
               className="w-full border border-gray-300 rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
             />
           </div>
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-2">
-              Новый пароль
-            </label>
+            <label className="block text-sm font-medium text-gray-700 mb-2">Новый пароль</label>
             <input
               type="password"
               className="w-full border border-gray-300 rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
             />
           </div>
           <div className="md:col-span-2">
-            <label className="block text-sm font-medium text-gray-700 mb-2">
-              Подтверждение пароля
-            </label>
+            <label className="block text-sm font-medium text-gray-700 mb-2">Подтвердите пароль</label>
             <input
               type="password"
               className="w-full border border-gray-300 rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
@@ -259,18 +226,18 @@ export default function Settings() {
         </div>
       </div>
     </div>
-  )
+  );
 
   const renderMarketplacesSettings = () => (
     <div className="space-y-6">
       <div>
-        <h3 className="text-lg font-medium text-gray-900 mb-4">Подключенные маркетплейсы</h3>
+        <h3 className="text-lg font-medium text-gray-900 mb-4">Состояние подключений</h3>
         <div className="space-y-4">
           {[
             { name: 'Wildberries', status: 'connected', lastSync: '21.07.2025 14:30' },
-            { name: 'OZON', status: 'connected', lastSync: '21.07.2025 14:25' },
+            { name: 'Ozon', status: 'connected', lastSync: '21.07.2025 14:25' },
             { name: 'Яндекс Маркет', status: 'error', lastSync: '21.07.2025 12:15' },
-            { name: 'Мегамаркет', status: 'disconnected', lastSync: 'Никогда' }
+            { name: 'Мегамаркет', status: 'disconnected', lastSync: 'не подключен' }
           ].map((marketplace, index) => (
             <div key={index} className="flex items-center justify-between p-4 border border-gray-200 rounded-lg">
               <div className="flex items-center">
@@ -279,41 +246,46 @@ export default function Settings() {
                 </div>
                 <div>
                   <h4 className="font-medium text-gray-900">{marketplace.name}</h4>
-                  <p className="text-sm text-gray-500">
-                    Последняя синхронизация: {marketplace.lastSync}
-                  </p>
+                  <p className="text-sm text-gray-500">Последняя синхронизация: {marketplace.lastSync}</p>
                 </div>
               </div>
               <div className="flex items-center space-x-3">
-                <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${
-                  marketplace.status === 'connected' 
-                    ? 'bg-green-100 text-green-800' 
-                    : marketplace.status === 'error'
-                    ? 'bg-red-100 text-red-800'
-                    : 'bg-gray-100 text-gray-800'
-                }`}>
+                <span
+                  className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${
+                    marketplace.status === 'connected'
+                      ? 'bg-green-100 text-green-800'
+                      : marketplace.status === 'error'
+                      ? 'bg-red-100 text-red-800'
+                      : 'bg-gray-100 text-gray-800'
+                  }`}
+                >
                   {marketplace.status === 'connected' && <CheckIcon className="h-3 w-3 mr-1" />}
-                  {marketplace.status === 'error' && <ExclamationTriangleIcon className="h-3 w-3 mr-1" />}
+                  {marketplace.status === 'error' && (
+                    <ExclamationTriangleIcon className="h-3 w-3 mr-1" />
+                  )}
                   {marketplace.status === 'disconnected' && <XMarkIcon className="h-3 w-3 mr-1" />}
-                  {marketplace.status === 'connected' ? 'Подключен' : 
-                   marketplace.status === 'error' ? 'Ошибка' : 'Отключен'}
+                  {marketplace.status === 'connected'
+                    ? 'Подключено'
+                    : marketplace.status === 'error'
+                    ? 'Ошибка'
+                    : 'Не подключено'}
                 </span>
                 <button className="inline-flex items-center px-3 py-1.5 border border-gray-300 rounded-md text-sm font-medium text-gray-700 bg-white hover:bg-gray-50">
-                  {marketplace.status === 'connected' ? 'Настроить' : 'Подключить'}
+                  {marketplace.status === 'connected' ? 'Переподключить' : 'Подключить'}
                 </button>
               </div>
             </div>
           ))}
         </div>
       </div>
-      
+
       <div>
-        <h3 className="text-lg font-medium text-gray-900 mb-4">Настройки синхронизации</h3>
+        <h3 className="text-lg font-medium text-gray-900 mb-4">Параметры синхронизации</h3>
         <div className="space-y-4">
           <div className="flex items-center justify-between">
             <div>
-              <label className="text-sm font-medium text-gray-900">Автоматическая синхронизация</label>
-              <p className="text-sm text-gray-500">Автоматически синхронизировать данные с маркетплейсами</p>
+              <label className="text-sm font-medium text-gray-900">Автосинхронизация</label>
+              <p className="text-sm text-gray-500">Регулярное обновление данных из маркетплейсов</p>
             </div>
             <input
               type="checkbox"
@@ -324,7 +296,7 @@ export default function Settings() {
           </div>
           <div>
             <label className="block text-sm font-medium text-gray-700 mb-2">
-              Интервал синхронизации (минуты)
+              Интервал синхронизации (мин)
             </label>
             <select
               value={settings.syncInterval}
@@ -341,17 +313,17 @@ export default function Settings() {
         </div>
       </div>
     </div>
-  )
+  );
 
   const renderNotificationSettings = () => (
     <div className="space-y-6">
       <div>
-        <h3 className="text-lg font-medium text-gray-900 mb-4">Способы уведомлений</h3>
+        <h3 className="text-lg font-medium text-gray-900 mb-4">Каналы уведомлений</h3>
         <div className="space-y-4">
           <div className="flex items-center justify-between">
             <div>
               <label className="text-sm font-medium text-gray-900">Email уведомления</label>
-              <p className="text-sm text-gray-500">Получать уведомления на электронную почту</p>
+              <p className="text-sm text-gray-500">Оповещения о важных событиях</p>
             </div>
             <input
               type="checkbox"
@@ -363,7 +335,7 @@ export default function Settings() {
           <div className="flex items-center justify-between">
             <div>
               <label className="text-sm font-medium text-gray-900">Push уведомления</label>
-              <p className="text-sm text-gray-500">Получать push-уведомления в браузере</p>
+              <p className="text-sm text-gray-500">Уведомления в браузере</p>
             </div>
             <input
               type="checkbox"
@@ -375,7 +347,7 @@ export default function Settings() {
           <div className="flex items-center justify-between">
             <div>
               <label className="text-sm font-medium text-gray-900">SMS уведомления</label>
-              <p className="text-sm text-gray-500">Получать SMS на мобильный телефон</p>
+              <p className="text-sm text-gray-500">Сообщения на телефон</p>
             </div>
             <input
               type="checkbox"
@@ -386,14 +358,14 @@ export default function Settings() {
           </div>
         </div>
       </div>
-      
+
       <div>
-        <h3 className="text-lg font-medium text-gray-900 mb-4">Типы уведомлений</h3>
+        <h3 className="text-lg font-medium text-gray-900 mb-4">События уведомлений</h3>
         <div className="space-y-4">
           <div className="flex items-center justify-between">
             <div>
               <label className="text-sm font-medium text-gray-900">Новые заказы</label>
-              <p className="text-sm text-gray-500">Уведомления о новых заказах</p>
+              <p className="text-sm text-gray-500">Оповещения о новых заказах</p>
             </div>
             <input
               type="checkbox"
@@ -404,8 +376,8 @@ export default function Settings() {
           </div>
           <div className="flex items-center justify-between">
             <div>
-              <label className="text-sm font-medium text-gray-900">Остатки товаров</label>
-              <p className="text-sm text-gray-500">Уведомления о низких остатках</p>
+              <label className="text-sm font-medium text-gray-900">Остатки на складе</label>
+              <p className="text-sm text-gray-500">Снижение остатков и нули</p>
             </div>
             <input
               type="checkbox"
@@ -416,8 +388,8 @@ export default function Settings() {
           </div>
           <div className="flex items-center justify-between">
             <div>
-              <label className="text-sm font-medium text-gray-900">Изменения цен</label>
-              <p className="text-sm text-gray-500">Уведомления об изменении цен конкурентов</p>
+              <label className="text-sm font-medium text-gray-900">Изменение цен</label>
+              <p className="text-sm text-gray-500">Уведомления при изменении цен</p>
             </div>
             <input
               type="checkbox"
@@ -429,17 +401,17 @@ export default function Settings() {
         </div>
       </div>
     </div>
-  )
+  );
 
   const renderSecuritySettings = () => (
     <div className="space-y-6">
       <div>
-        <h3 className="text-lg font-medium text-gray-900 mb-4">Аутентификация</h3>
+        <h3 className="text-lg font-medium text-gray-900 mb-4">Параметры безопасности</h3>
         <div className="space-y-4">
           <div className="flex items-center justify-between">
             <div>
               <label className="text-sm font-medium text-gray-900">Двухфакторная аутентификация</label>
-              <p className="text-sm text-gray-500">Дополнительная защита учетной записи</p>
+              <p className="text-sm text-gray-500">Дополнительная защита аккаунта</p>
             </div>
             <input
               type="checkbox"
@@ -449,9 +421,7 @@ export default function Settings() {
             />
           </div>
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-2">
-              Время сессии (минуты)
-            </label>
+            <label className="block text-sm font-medium text-gray-700 mb-2">Тайм-аут сессии (мин)</label>
             <select
               value={settings.sessionTimeout}
               onChange={(e) => handleSettingChange('sessionTimeout', parseInt(e.target.value))}
@@ -483,17 +453,15 @@ export default function Settings() {
         </div>
       </div>
     </div>
-  )
+  );
 
   const renderInterfaceSettings = () => (
     <div className="space-y-6">
       <div>
-        <h3 className="text-lg font-medium text-gray-900 mb-4">Внешний вид</h3>
+        <h3 className="text-lg font-medium text-gray-900 mb-4">Настройки интерфейса</h3>
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-2">
-              Тема оформления
-            </label>
+            <label className="block text-sm font-medium text-gray-700 mb-2">Тема</label>
             <select
               value={settings.theme}
               onChange={(e) => handleSettingChange('theme', e.target.value)}
@@ -505,9 +473,7 @@ export default function Settings() {
             </select>
           </div>
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-2">
-              Язык интерфейса
-            </label>
+            <label className="block text-sm font-medium text-gray-700 mb-2">Язык</label>
             <select
               value={settings.language}
               onChange={(e) => handleSettingChange('language', e.target.value)}
@@ -518,9 +484,7 @@ export default function Settings() {
             </select>
           </div>
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-2">
-              Формат даты
-            </label>
+            <label className="block text-sm font-medium text-gray-700 mb-2">Формат даты</label>
             <select
               value={settings.dateFormat}
               onChange={(e) => handleSettingChange('dateFormat', e.target.value)}
@@ -532,9 +496,7 @@ export default function Settings() {
             </select>
           </div>
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-2">
-              Валюта
-            </label>
+            <label className="block text-sm font-medium text-gray-700 mb-2">Валюта</label>
             <select
               value={settings.currency}
               onChange={(e) => handleSettingChange('currency', e.target.value)}
@@ -548,17 +510,17 @@ export default function Settings() {
         </div>
       </div>
     </div>
-  )
+  );
 
   const renderBackupSettings = () => (
     <div className="space-y-6">
       <div>
-        <h3 className="text-lg font-medium text-gray-900 mb-4">Автоматическое резервное копирование</h3>
+        <h3 className="text-lg font-medium text-gray-900 mb-4">Автосохранение</h3>
         <div className="space-y-4">
           <div className="flex items-center justify-between">
             <div>
-              <label className="text-sm font-medium text-gray-900">Включить автоматическое резервное копирование</label>
-              <p className="text-sm text-gray-500">Регулярно создавать резервные копии данных</p>
+              <label className="text-sm font-medium text-gray-900">Автоматические резервные копии</label>
+              <p className="text-sm text-gray-500">Регулярное сохранение базы</p>
             </div>
             <input
               type="checkbox"
@@ -569,7 +531,7 @@ export default function Settings() {
           </div>
           <div>
             <label className="block text-sm font-medium text-gray-700 mb-2">
-              Периодичность резервного копирования
+              Интервал резервного копирования
             </label>
             <select
               value={settings.backupInterval}
@@ -577,15 +539,13 @@ export default function Settings() {
               className="w-full border border-gray-300 rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
             >
               <option value="hourly">Каждый час</option>
-              <option value="daily">Ежедневно</option>
-              <option value="weekly">Еженедельно</option>
-              <option value="monthly">Ежемесячно</option>
+              <option value="daily">Каждый день</option>
+              <option value="weekly">Каждую неделю</option>
+              <option value="monthly">Каждый месяц</option>
             </select>
           </div>
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-2">
-              Срок хранения резервных копий (дни)
-            </label>
+            <label className="block text-sm font-medium text-gray-700 mb-2">Хранить копии (дни)</label>
             <select
               value={settings.backupRetention}
               onChange={(e) => handleSettingChange('backupRetention', parseInt(e.target.value))}
@@ -599,56 +559,52 @@ export default function Settings() {
           </div>
         </div>
       </div>
-      
+
       <div>
-        <h3 className="text-lg font-medium text-gray-900 mb-4">Управление резервными копиями</h3>
+        <h3 className="text-lg font-medium text-gray-900 mb-4">Управление копиями</h3>
         <div className="space-y-3">
           <button className="inline-flex items-center px-4 py-2 bg-blue-600 text-white rounded-md text-sm font-medium hover:bg-blue-700">
             <CloudArrowUpIcon className="h-4 w-4 mr-2" />
-            Создать резервную копию сейчас
+            Создать резервную копию
           </button>
           <button className="inline-flex items-center px-4 py-2 border border-gray-300 rounded-md text-sm font-medium text-gray-700 bg-white hover:bg-gray-50">
             <CircleStackIcon className="h-4 w-4 mr-2" />
-            Восстановить из резервной копии
+            Просмотреть копии
           </button>
         </div>
       </div>
     </div>
-  )
+  );
 
   const renderTabContent = () => {
     switch (activeTab) {
       case 'general':
-        return renderGeneralSettings()
+        return renderGeneralSettings();
       case 'profile':
-        return renderProfileSettings()
+        return renderProfileSettings();
       case 'marketplaces':
-        return renderMarketplacesSettings()
+        return renderMarketplacesSettings();
       case 'notifications':
-        return renderNotificationSettings()
+        return renderNotificationSettings();
       case 'security':
-        return renderSecuritySettings()
+        return renderSecuritySettings();
       case 'interface':
-        return renderInterfaceSettings()
+        return renderInterfaceSettings();
       case 'backup':
-        return renderBackupSettings()
+        return renderBackupSettings();
       default:
-        return renderGeneralSettings()
+        return renderGeneralSettings();
     }
-  }
+  };
 
   return (
     <div className="space-y-6">
-      {/* Заголовок страницы */}
       <div>
-        <h1 className="text-2xl font-bold text-gray-900">Администрирование</h1>
-        <p className="text-sm text-gray-600 mt-1">
-          Настройки системы и конфигурация
-        </p>
+        <h1 className="text-2xl font-bold text-gray-900">Настройки</h1>
+        <p className="text-sm text-gray-600 mt-1">Управляйте профилем, интеграциями и безопасностью</p>
       </div>
 
       <div className="flex flex-col lg:flex-row gap-6">
-        {/* Боковое меню */}
         <div className="lg:w-64 flex-shrink-0">
           <div className="bg-white border border-gray-200 rounded-lg shadow-sm">
             <nav className="p-2">
@@ -662,9 +618,11 @@ export default function Settings() {
                       : 'text-gray-700 hover:bg-gray-50 hover:text-gray-900'
                   }`}
                 >
-                  <tab.icon className={`h-5 w-5 mr-3 ${
-                    activeTab === tab.id ? 'text-blue-600' : 'text-gray-500'
-                  }`} />
+                  <tab.icon
+                    className={`h-5 w-5 mr-3 ${
+                      activeTab === tab.id ? 'text-blue-600' : 'text-gray-500'
+                    }`}
+                  />
                   <div>
                     <div className="font-medium">{tab.name}</div>
                     <div className="text-xs text-gray-500 mt-0.5">{tab.description}</div>
@@ -675,17 +633,13 @@ export default function Settings() {
           </div>
         </div>
 
-        {/* Основной контент */}
         <div className="flex-1">
           <div className="bg-white border border-gray-200 rounded-lg shadow-sm">
-            <div className="p-6">
-              {renderTabContent()}
-            </div>
-            
-            {/* Кнопки сохранения */}
+            <div className="p-6">{renderTabContent()}</div>
+
             <div className="px-6 py-4 border-t border-gray-200 bg-gray-50 flex justify-end space-x-3">
               <button className="inline-flex items-center px-4 py-2 border border-gray-300 rounded-md text-sm font-medium text-gray-700 bg-white hover:bg-gray-50">
-                Отменить
+                Сбросить
               </button>
               <button className="inline-flex items-center px-4 py-2 bg-blue-600 text-white rounded-md text-sm font-medium hover:bg-blue-700">
                 Сохранить изменения
@@ -695,5 +649,5 @@ export default function Settings() {
         </div>
       </div>
     </div>
-  )
+  );
 }

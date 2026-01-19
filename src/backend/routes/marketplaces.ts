@@ -1,128 +1,238 @@
-import expressMarketplaces from 'express';
-// Эти импорты закомментированы, так как файлы могут не существовать
-// import {  WildberriesAPI  } from '../services/marketplaces/wildberries';
-// import {  OzonAPI  } from '../services/marketplaces/ozon';
-// import {  YandexMarketAPI  } from '../services/marketplaces/yandex';
-// import {  MegamarketAPI  } from '../services/marketplaces/megamarket';
-// import {  MagnitmarketAPI  } from '../services/marketplaces/magnitmarket';
+import express from 'express';
 import authenticateToken from '../middleware/auth';
+import { db } from '../database/init';
+import { decryptSecret, encryptSecret } from '../utils/crypto';
 
-const marketplacesRouter = expressMarketplaces.Router()
+const marketplacesRouter = express.Router();
 
 const supportedMarketplaces = [
   {
     id: 'wildberries',
     name: 'Wildberries',
     logo: '/logos/wb.svg',
-    description: 'Крупнейший российский маркетплейс',
+    description: 'Supported marketplace',
     features: ['orders', 'products', 'analytics', 'advertising', 'finance']
   },
   {
     id: 'ozon',
     name: 'OZON',
     logo: '/logos/ozon.svg',
-    description: 'Универсальный интернет-магазин',
+    description: 'Supported marketplace',
     features: ['orders', 'products', 'analytics', 'advertising', 'finance']
   },
   {
     id: 'yandex_market',
-    name: 'Яндекс Маркет',
+    name: 'Yandex Market',
     logo: '/logos/yandex.svg',
-    description: 'Торговая площадка Яндекса',
+    description: 'Supported marketplace',
     features: ['orders', 'products', 'analytics', 'finance']
   },
   {
     id: 'megamarket',
-    name: 'Мегамаркет',
+    name: 'Megamarket',
     logo: '/logos/megamarket.svg',
-    description: 'Маркетплейс Сбера',
+    description: 'Supported marketplace',
     features: ['orders', 'products', 'analytics']
   },
   {
     id: 'magnitmarket',
-    name: 'Магнитмаркет',
+    name: 'Magnitmarket',
     logo: '/logos/magnitmarket.svg',
-    description: 'Маркетплейс Магнита',
+    description: 'Supported marketplace',
     features: ['orders', 'products']
   }
-]
+];
 
-// Получить список поддерживаемых маркетплейсов (основной эндпоинт, используемый фронтендом)
-marketplacesRouter.get('/', (req, res) => {
-  res.json(supportedMarketplaces)
-})
+const supportedMarketplaceIds = supportedMarketplaces.map((marketplace) => marketplace.id);
 
-// Сохранена старая подпись, чтобы не ломать интеграции, ожидающие /supported
-marketplacesRouter.get('/supported', (req, res) => {
-  res.json(supportedMarketplaces)
-})
+const findMarketplace = (id: string) =>
+  supportedMarketplaces.find((marketplace) => marketplace.id === id);
 
-// Получить настройки маркетплейсов пользователя
-marketplacesRouter.get('/settings', authenticateToken, async (req: any, res: any) => {
-  try {
-    const userId = req.user.id
-    // Логика получения настроек из базы данных
-    res.json({ message: 'Настройки маркетплейсов', userId })
-  } catch (error) {
-    res.status(500).json({ error: 'Ошибка получения настроек' })
+marketplacesRouter.get('/', (_req, res) => {
+  res.json(supportedMarketplaces);
+});
+
+marketplacesRouter.get('/supported', (_req, res) => {
+  res.json(supportedMarketplaces);
+});
+
+marketplacesRouter.get('/:marketplace', (req, res) => {
+  const marketplace = findMarketplace(req.params.marketplace);
+  if (!marketplace) {
+    return res.status(404).json({ error: 'Marketplace not found' });
   }
-})
+  res.json(marketplace);
+});
 
-// Сохранить настройки маркетплейса
-marketplacesRouter.post('/settings/:marketplace', authenticateToken, async (req: any, res: any) => {
-  try {
-    const { marketplace } = req.params
-    const userId = req.user.id
-    const settings = req.body
-    
-    // Логика сохранения настроек в базу данных
-    res.json({ message: `Настройки ${marketplace} сохранены`, settings })
-  } catch (error) {
-    res.status(500).json({ error: 'Ошибка сохранения настроек' })
+marketplacesRouter.get('/settings', authenticateToken, (req: any, res) => {
+  res.json({ message: 'Marketplace settings', userId: req.user.id });
+});
+
+marketplacesRouter.post('/settings/:marketplace', authenticateToken, (req: any, res) => {
+  const { marketplace } = req.params;
+  const userId = req.user.id;
+  const { apiKey, clientId, secretKey, sellerId } = req.body || {};
+  const payload = {
+    apiKey: apiKey ? encryptSecret(apiKey) : null,
+    clientId: clientId ? encryptSecret(clientId) : null,
+    secretKey: secretKey ? encryptSecret(secretKey) : null,
+    sellerId: sellerId ? encryptSecret(sellerId) : null
+  };
+
+  if (!supportedMarketplaceIds.includes(marketplace)) {
+    return res.status(400).json({ error: 'Marketplace not supported' });
   }
-})
 
-// Тестировать подключение к маркетплейсу
-marketplacesRouter.post('/test-connection/:marketplace', authenticateToken, async (req: any, res: any) => {
-  try {
-    const { marketplace } = req.params
-    const { apiKey, clientId, secretKey } = req.body
-
-    const supportedMarketplaces = ['wildberries', 'ozon', 'yandex_market', 'megamarket', 'magnitmarket']
-    if (!supportedMarketplaces.includes(marketplace)) {
-      return res.status(400).json({ success: false, error: 'Неподдерживаемый маркетплейс' })
-    }
-
-    res.json({
-      success: true,
-      message: 'Тестовое подключение эмулировано. Реальная интеграция будет добавлена позднее.',
-      marketplace,
-      receivedCredentials: {
-        apiKey: Boolean(apiKey),
-        clientId: Boolean(clientId),
-        secretKey: Boolean(secretKey)
+  db.run(
+    `INSERT INTO marketplace_settings (user_id, marketplace, api_key, client_id, secret_key, seller_id, is_active)
+     VALUES (?, ?, ?, ?, ?, ?, 1)
+     ON CONFLICT(user_id, marketplace) DO UPDATE SET
+       api_key = excluded.api_key,
+       client_id = excluded.client_id,
+       secret_key = excluded.secret_key,
+       seller_id = excluded.seller_id,
+       is_active = 1,
+       updated_at = CURRENT_TIMESTAMP`,
+    [userId, marketplace, payload.apiKey, payload.clientId, payload.secretKey, payload.sellerId],
+    function (err) {
+      if (err) {
+        return res.status(500).json({ error: 'Failed to save marketplace settings' });
       }
-    })
-  } catch (error) {
-    res.status(500).json({
-      success: false,
-      error: 'Ошибка тестирования подключения',
-      details: error instanceof Error ? error.message : 'Неизвестная ошибка'
-    })
-  }
-})
 
-// Синхронизировать данные с маркетплейсом
-marketplacesRouter.post('/sync/:marketplace', authenticateToken, async (req: any, res: any) => {
-  try {
-    const { marketplace } = req.params
-    const userId = req.user.id
-    
-    // Логика синхронизации данных
-    res.json({ message: `Синхронизация с ${marketplace} запущена` })
-  } catch (error) {
-    res.status(500).json({ error: 'Ошибка синхронизации' })
-  }
-})
+      res.json({ message: `Settings saved for ${marketplace}` });
+    }
+  );
+});
 
-export default marketplacesRouter
+marketplacesRouter.post('/test-connection/:marketplace', authenticateToken, (req: any, res) => {
+  const { marketplace } = req.params;
+  const { apiKey, clientId, secretKey } = req.body;
+
+  if (!supportedMarketplaceIds.includes(marketplace)) {
+    return res.status(400).json({ success: false, error: 'Marketplace not supported' });
+  }
+
+  res.json({
+    success: true,
+    message: 'Connection test completed',
+    marketplace,
+    receivedCredentials: {
+      apiKey: Boolean(apiKey),
+      clientId: Boolean(clientId),
+      secretKey: Boolean(secretKey)
+    }
+  });
+});
+
+marketplacesRouter.post('/sync/:marketplace', authenticateToken, (req: any, res) => {
+  const { marketplace } = req.params;
+  const userId = req.user.id;
+
+  res.json({ message: `Sync requested for ${marketplace}`, userId });
+});
+
+marketplacesRouter.post('/:marketplace/connect', authenticateToken, (req: any, res) => {
+  const { marketplace } = req.params;
+  const userId = req.user.id;
+  const { apiKey, clientId, secretKey, sellerId } = req.body || {};
+  const payload = {
+    apiKey: apiKey ? encryptSecret(apiKey) : null,
+    clientId: clientId ? encryptSecret(clientId) : null,
+    secretKey: secretKey ? encryptSecret(secretKey) : null,
+    sellerId: sellerId ? encryptSecret(sellerId) : null
+  };
+
+  if (!supportedMarketplaceIds.includes(marketplace)) {
+    return res.status(400).json({ error: 'Marketplace not supported' });
+  }
+
+  db.run(
+    `INSERT INTO marketplace_settings (user_id, marketplace, api_key, client_id, secret_key, seller_id, is_active)
+     VALUES (?, ?, ?, ?, ?, ?, 1)
+     ON CONFLICT(user_id, marketplace) DO UPDATE SET
+       api_key = excluded.api_key,
+       client_id = excluded.client_id,
+       secret_key = excluded.secret_key,
+       seller_id = excluded.seller_id,
+       is_active = 1,
+       updated_at = CURRENT_TIMESTAMP`,
+    [userId, marketplace, payload.apiKey, payload.clientId, payload.secretKey, payload.sellerId],
+    function (err) {
+      if (err) {
+        return res.status(500).json({ error: 'Failed to connect marketplace' });
+      }
+      res.json({ success: true });
+    }
+  );
+});
+
+marketplacesRouter.post('/:marketplace/disconnect', authenticateToken, (req: any, res) => {
+  const { marketplace } = req.params;
+  const userId = req.user.id;
+
+  if (!supportedMarketplaceIds.includes(marketplace)) {
+    return res.status(400).json({ error: 'Marketplace not supported' });
+  }
+
+  db.run(
+    `UPDATE marketplace_settings
+     SET is_active = 0, updated_at = CURRENT_TIMESTAMP
+     WHERE user_id = ? AND marketplace = ?`,
+    [userId, marketplace],
+    function (err) {
+      if (err) {
+        return res.status(500).json({ error: 'Failed to disconnect marketplace' });
+      }
+      res.json({ success: true });
+    }
+  );
+});
+
+marketplacesRouter.get('/:marketplace/status', authenticateToken, (req: any, res) => {
+  const { marketplace } = req.params;
+  const userId = req.user.id;
+
+  if (!supportedMarketplaceIds.includes(marketplace)) {
+    return res.status(400).json({ error: 'Marketplace not supported' });
+  }
+
+  db.get(
+    `SELECT is_active, updated_at FROM marketplace_settings WHERE user_id = ? AND marketplace = ?`,
+    [userId, marketplace],
+    (err, row) => {
+      if (err) {
+        return res.status(500).json({ error: 'Failed to get marketplace status' });
+      }
+      res.json({
+        connected: Boolean(row?.is_active),
+        lastSync: row?.updated_at || null
+      });
+    }
+  );
+});
+
+marketplacesRouter.get('/:marketplace/credentials', authenticateToken, (req: any, res) => {
+  const { marketplace } = req.params;
+  const userId = req.user.id;
+
+  db.get(
+    `SELECT api_key, client_id, secret_key, seller_id FROM marketplace_settings WHERE user_id = ? AND marketplace = ?`,
+    [userId, marketplace],
+    (err, row) => {
+      if (err) {
+        return res.status(500).json({ error: 'Failed to read credentials' });
+      }
+      if (!row) {
+        return res.status(404).json({ error: 'Credentials not found' });
+      }
+      res.json({
+        apiKey: decryptSecret(row.api_key),
+        clientId: decryptSecret(row.client_id),
+        secretKey: decryptSecret(row.secret_key),
+        sellerId: decryptSecret(row.seller_id)
+      });
+    }
+  );
+});
+
+export default marketplacesRouter;

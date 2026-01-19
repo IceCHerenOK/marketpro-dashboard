@@ -1,63 +1,61 @@
-import React, { useState, useEffect } from 'react'
-import { api } from '../utils/api'
-import { Store, Settings, CheckCircle, XCircle, RefreshCw } from 'lucide-react'
+import React, { useState, useEffect } from 'react';
+import { api } from '../utils/api';
+import { Store, Settings, CheckCircle, XCircle, RefreshCw } from 'lucide-react';
 
 interface Marketplace {
-  id: string
-  name: string
-  logo: string
-  description: string
-  features: string[]
-  connected: boolean
-  lastSync?: string
+  id: string;
+  name: string;
+  logo: string;
+  description: string;
+  features: string[];
+  connected: boolean;
+  lastSync?: string;
 }
 
 export default function Marketplaces() {
-  const [marketplaces, setMarketplaces] = useState<Marketplace[]>([])
-  const [loading, setLoading] = useState(true)
-  const [selectedMarketplace, setSelectedMarketplace] = useState<string | null>(null)
+  const [marketplaces, setMarketplaces] = useState<Marketplace[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [selectedMarketplace, setSelectedMarketplace] = useState<string | null>(null);
   const [credentials, setCredentials] = useState({
     apiKey: '',
     clientId: '',
     secretKey: ''
-  })
+  });
 
   useEffect(() => {
-    fetchMarketplaces()
-  }, [])
+    fetchMarketplaces();
+  }, []);
 
   const fetchMarketplaces = async () => {
     try {
-      setLoading(true)
-      // Используем метод из нашего API клиента
-      const data = await api.marketplaces.getAll()
+      setLoading(true);
+      const data = await api.marketplaces.getAll();
 
       if (Array.isArray(data) && data.length > 0) {
         const normalized = data.map((marketplace: any) => ({
           ...marketplace,
           connected: Boolean(marketplace.connected),
-          lastSync: marketplace.lastSync ?? undefined,
-        }))
-        setMarketplaces(normalized)
-        return
+          lastSync: marketplace.lastSync ?? undefined
+        }));
+        setMarketplaces(normalized);
+        return;
       }
 
-      // Если API еще не реализовано, используем временные данные
       const mockMarketplaces = [
         {
           id: 'wildberries',
           name: 'Wildberries',
           logo: '/logos/wb.svg',
-          description: 'Крупнейший маркетплейс в России',
+          description: 'Крупнейший маркетплейс России',
           features: ['orders', 'products', 'analytics', 'finance'],
           connected: Math.random() > 0.5,
           lastSync: new Date().toISOString()
         },
         {
           id: 'ozon',
-          name: 'OZON',
+          name: 'Ozon',
           logo: '/logos/ozon.svg',
-          description: 'Один из ведущих маркетплейсов',
+          description: 'Один из крупнейших маркетплейсов',
           features: ['orders', 'products', 'analytics', 'advertising', 'finance'],
           connected: Math.random() > 0.5,
           lastSync: new Date().toISOString()
@@ -74,7 +72,7 @@ export default function Marketplaces() {
           id: 'megamarket',
           name: 'Мегамаркет',
           logo: '/logos/megamarket.svg',
-          description: 'Маркетплейс от Сбера',
+          description: 'Маркетплейс от Сбер',
           features: ['orders', 'products'],
           connected: false
         },
@@ -90,87 +88,76 @@ export default function Marketplaces() {
 
       setMarketplaces(mockMarketplaces);
     } catch (error) {
-      console.error('Ошибка загрузки маркетплейсов:', error)
-      // Используем временные данные в случае ошибки
+      console.error('Ошибка загрузки маркетплейсов:', error);
       setMarketplaces([
         {
           id: 'wildberries',
           name: 'Wildberries',
           logo: '/logos/wb.svg',
-          description: 'Крупнейший маркетплейс в России',
+          description: 'Крупнейший маркетплейс России',
           features: ['orders', 'products', 'analytics', 'finance'],
           connected: false
         },
         {
           id: 'ozon',
-          name: 'OZON',
+          name: 'Ozon',
           logo: '/logos/ozon.svg',
-          description: 'Один из ведущих маркетплейсов',
+          description: 'Один из крупнейших маркетплейсов',
           features: ['orders', 'products', 'analytics', 'advertising', 'finance'],
           connected: false
         }
       ]);
     } finally {
-      setLoading(false)
+      setLoading(false);
     }
-  }
+  };
 
   const handleConnect = async (marketplaceId: string) => {
     try {
-      // Используем метод из нашего API клиента
-      const result = await api.marketplaces.connect(marketplaceId, credentials);
-      // Обновляем список
+      await api.marketplaces.connect(marketplaceId, credentials);
       fetchMarketplaces();
       setSelectedMarketplace(null);
       setCredentials({ apiKey: '', clientId: '', secretKey: '' });
-      // Здесь можно добавить уведомление об успешном подключении
     } catch (error) {
       console.error('Ошибка подключения:', error);
-      // Здесь можно добавить уведомление об ошибке
     }
-  }
+  };
 
   const handleSync = async (marketplaceId: string) => {
     try {
-      // Используем метод из нашего API клиента
       await api.marketplaces.checkStatus(marketplaceId);
-      // Обновляем список после синхронизации
       fetchMarketplaces();
-      // Здесь можно добавить уведомление об успешной синхронизации
     } catch (error) {
       console.error('Ошибка синхронизации:', error);
-      // Здесь можно добавить уведомление об ошибке
     }
-  }
+  };
 
   const getFeatureText = (feature: string) => {
     const featureMap: { [key: string]: string } = {
-      'orders': 'Заказы',
-      'products': 'Товары',
-      'analytics': 'Аналитика',
-      'advertising': 'Реклама',
-      'finance': 'Финансы'
-    }
-    return featureMap[feature] || feature
-  }
+      orders: 'Заказы',
+      products: 'Товары',
+      analytics: 'Аналитика',
+      advertising: 'Реклама',
+      finance: 'Финансы'
+    };
+    return featureMap[feature] || feature;
+  };
 
   if (loading) {
     return (
       <div className="flex items-center justify-center h-64">
         <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600"></div>
       </div>
-    )
+    );
   }
 
   return (
     <div className="space-y-6">
-      {/* Заголовок */}
       <div>
         <h1 className="text-2xl font-bold text-gray-900">Маркетплейсы</h1>
-        <p className="text-gray-600">Настройка подключений к торговым площадкам</p>
+        <p className="text-gray-600">Подключайте интеграции и управляйте доступом к API</p>
       </div>
 
-      {/* Список маркетплейсов */}
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
         {marketplaces.map((marketplace) => (
           <div key={marketplace.id} className="card">
@@ -221,7 +208,7 @@ export default function Marketplaces() {
                     className="btn-secondary flex items-center flex-1"
                   >
                     <RefreshCw className="h-4 w-4 mr-2" />
-                    Синхронизация
+                    Синхронизировать
                   </button>
                   <button
                     onClick={() => setSelectedMarketplace(marketplace.id)}
@@ -243,19 +230,16 @@ export default function Marketplaces() {
         ))}
       </div>
 
-      {/* Модальное окно настройки */}
       {selectedMarketplace && (
         <div className="fixed inset-0 bg-gray-600 bg-opacity-50 flex items-center justify-center z-50">
           <div className="bg-white rounded-lg p-6 w-full max-w-md">
             <h3 className="text-lg font-semibold text-gray-900 mb-4">
-              Настройка подключения к {marketplaces.find(mp => mp.id === selectedMarketplace)?.name}
+              Подключить {marketplaces.find((mp) => mp.id === selectedMarketplace)?.name}
             </h3>
 
             <div className="space-y-4">
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">
-                  API ключ
-                </label>
+                <label className="block text-sm font-medium text-gray-700 mb-1">API ключ</label>
                 <input
                   type="password"
                   value={credentials.apiKey}
@@ -267,9 +251,7 @@ export default function Marketplaces() {
 
               {(selectedMarketplace === 'ozon' || selectedMarketplace === 'yandex_market') && (
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-1">
-                    Client ID
-                  </label>
+                  <label className="block text-sm font-medium text-gray-700 mb-1">Client ID</label>
                   <input
                     type="text"
                     value={credentials.clientId}
@@ -282,9 +264,7 @@ export default function Marketplaces() {
 
               {selectedMarketplace === 'yandex_market' && (
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-1">
-                    Secret Key
-                  </label>
+                  <label className="block text-sm font-medium text-gray-700 mb-1">Secret Key</label>
                   <input
                     type="password"
                     value={credentials.secretKey}
@@ -299,8 +279,8 @@ export default function Marketplaces() {
             <div className="flex items-center justify-end space-x-3 mt-6">
               <button
                 onClick={() => {
-                  setSelectedMarketplace(null)
-                  setCredentials({ apiKey: '', clientId: '', secretKey: '' })
+                  setSelectedMarketplace(null);
+                  setCredentials({ apiKey: '', clientId: '', secretKey: '' });
                 }}
                 className="btn-secondary"
               >
@@ -318,36 +298,35 @@ export default function Marketplaces() {
         </div>
       )}
 
-      {/* Инструкции */}
       <div className="card">
         <h3 className="text-lg font-semibold text-gray-900 mb-4">Как получить API ключи</h3>
         <div className="space-y-4">
           <div>
             <h4 className="font-medium text-gray-900">Wildberries</h4>
             <p className="text-sm text-gray-600">
-              Личный кабинет → Настройки → Доступ к API → Создать новый токен
+              Откройте раздел «Доступ к API» в личном кабинете продавца и создайте ключ доступа.
             </p>
           </div>
           <div>
-            <h4 className="font-medium text-gray-900">OZON</h4>
+            <h4 className="font-medium text-gray-900">Ozon</h4>
             <p className="text-sm text-gray-600">
-              Личный кабинет → Настройки → API ключи → Создать новый ключ
+              В личном кабинете продавца создайте API ключ и Client ID в разделе «Настройки API».
             </p>
           </div>
           <div>
             <h4 className="font-medium text-gray-900">Яндекс Маркет</h4>
             <p className="text-sm text-gray-600">
-              Партнерский интерфейс → Настройки → API → Получить OAuth токен
+              Создайте OAuth приложение и получите Client ID / Secret Key для интеграции.
             </p>
           </div>
           <div>
-            <h4 className="font-medium text-gray-900">Мегамаркет и Магнитмаркет</h4>
+            <h4 className="font-medium text-gray-900">Мегамаркет и Магнит Маркет</h4>
             <p className="text-sm text-gray-600">
-              Обратитесь к менеджеру для получения доступа к API
+              Получите доступ к API через службу поддержки или в личном кабинете продавца.
             </p>
           </div>
         </div>
       </div>
     </div>
-  )
+  );
 }

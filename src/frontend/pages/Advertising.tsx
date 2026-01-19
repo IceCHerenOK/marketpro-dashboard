@@ -1,22 +1,22 @@
-import React, { useState, useEffect } from 'react'
-import { api } from '../utils/api'
-import { Megaphone, Plus, Play, Pause, BarChart3, Eye } from 'lucide-react'
+import React, { useState, useEffect } from 'react';
+import { axiosInstance } from '../utils/api';
+import { Megaphone, Plus, Play, Pause, BarChart3, Eye } from 'lucide-react';
 
 interface Campaign {
-  id: number
-  name: string
-  marketplace: string
-  type: string
-  status: string
-  budget: number
-  spent: number
-  clicks: number
-  impressions: number
-  conversions: number
+  id: number;
+  name: string;
+  marketplace: string;
+  type: string;
+  status: string;
+  budget: number;
+  spent: number;
+  clicks: number;
+  impressions: number;
+  conversions: number;
 }
 
 export default function Advertising() {
-  const [campaigns, setCampaigns] = useState<Campaign[]>([])
+  const [campaigns, setCampaigns] = useState<Campaign[]>([]);
   const [stats, setStats] = useState({
     totalBudget: 0,
     totalSpent: 0,
@@ -24,71 +24,74 @@ export default function Advertising() {
     totalImpressions: 0,
     ctr: 0,
     conversionRate: 0
-  })
-  const [loading, setLoading] = useState(true)
+  });
+  const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    fetchAdvertisingData()
-  }, [])
+    fetchAdvertisingData();
+  }, []);
 
   const fetchAdvertisingData = async () => {
     try {
-      setLoading(true)
-      
-      const [campaignsRes, statsRes] = await Promise.all([
-        api.get('/advertising/campaigns'),
-        api.get('/advertising/stats')
-      ])
+      setLoading(true);
 
-      setCampaigns(campaignsRes.data.campaigns || [])
-      setStats(statsRes.data)
+      const [campaignsRes, statsRes] = await Promise.all([
+        axiosInstance.get('/advertising/campaigns'),
+        axiosInstance.get('/advertising/stats')
+      ]);
+
+      setCampaigns(campaignsRes.data.campaigns || []);
+      setStats(statsRes.data);
     } catch (error) {
-      console.error('Ошибка загрузки рекламных данных:', error)
+      console.error('Ошибка загрузки рекламных данных:', error);
     } finally {
-      setLoading(false)
+      setLoading(false);
     }
-  }
+  };
 
   const formatCurrency = (value: number) => {
     return new Intl.NumberFormat('ru-RU', {
       style: 'currency',
       currency: 'RUB'
-    }).format(value)
-  }
+    }).format(value);
+  };
 
   const getStatusColor = (status: string) => {
     switch (status) {
-      case 'active': return 'bg-green-100 text-green-800'
-      case 'paused': return 'bg-yellow-100 text-yellow-800'
-      case 'stopped': return 'bg-red-100 text-red-800'
-      default: return 'bg-gray-100 text-gray-800'
+      case 'active':
+        return 'bg-green-100 text-green-800';
+      case 'paused':
+        return 'bg-yellow-100 text-yellow-800';
+      case 'stopped':
+        return 'bg-red-100 text-red-800';
+      default:
+        return 'bg-gray-100 text-gray-800';
     }
-  }
+  };
 
   const getStatusText = (status: string) => {
     const statusMap: { [key: string]: string } = {
-      'active': 'Активная',
-      'paused': 'Приостановлена',
-      'stopped': 'Остановлена'
-    }
-    return statusMap[status] || status
-  }
+      active: 'Активна',
+      paused: 'На паузе',
+      stopped: 'Остановлена'
+    };
+    return statusMap[status] || status;
+  };
 
   if (loading) {
     return (
       <div className="flex items-center justify-center h-64">
         <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600"></div>
       </div>
-    )
+    );
   }
 
   return (
     <div className="space-y-6">
-      {/* Заголовок */}
       <div className="flex items-center justify-between">
         <div>
           <h1 className="text-2xl font-bold text-gray-900">Реклама</h1>
-          <p className="text-gray-600">Управление рекламными кампаниями</p>
+          <p className="text-gray-600">Управление кампаниями и эффективностью</p>
         </div>
         <button className="btn-primary flex items-center">
           <Plus className="h-4 w-4 mr-2" />
@@ -96,7 +99,6 @@ export default function Advertising() {
         </button>
       </div>
 
-      {/* Основные метрики */}
       <div className="grid grid-cols-1 md:grid-cols-4 gap-6">
         <div className="card">
           <div className="flex items-center justify-between">
@@ -143,7 +145,7 @@ export default function Advertising() {
             <div>
               <p className="text-sm font-medium text-gray-600">Конверсия</p>
               <p className="text-2xl font-bold text-gray-900">{stats.conversionRate.toFixed(2)}%</p>
-              <p className="text-sm text-gray-500">Из {stats.totalClicks.toLocaleString()} кликов</p>
+              <p className="text-sm text-gray-500">из {stats.totalClicks.toLocaleString()} кликов</p>
             </div>
             <div className="bg-purple-100 p-3 rounded-full">
               <BarChart3 className="h-6 w-6 text-purple-600" />
@@ -152,19 +154,16 @@ export default function Advertising() {
         </div>
       </div>
 
-      {/* Список кампаний */}
       <div className="card">
         <div className="flex items-center justify-between mb-4">
-          <h3 className="text-lg font-semibold text-gray-900">
-            Рекламные кампании ({campaigns.length})
-          </h3>
+          <h3 className="text-lg font-semibold text-gray-900">Кампании ({campaigns.length})</h3>
         </div>
 
         {campaigns.length === 0 ? (
           <div className="text-center py-12">
             <Megaphone className="h-12 w-12 text-gray-400 mx-auto mb-4" />
             <h3 className="text-lg font-medium text-gray-900 mb-2">Кампании не найдены</h3>
-            <p className="text-gray-500">Создайте первую рекламную кампанию</p>
+            <p className="text-gray-500">Создайте кампанию, чтобы начать рекламу</p>
           </div>
         ) : (
           <div className="overflow-x-auto">
@@ -251,21 +250,20 @@ export default function Advertising() {
         )}
       </div>
 
-      {/* Эффективность кампаний */}
       <div className="card">
         <h3 className="text-lg font-semibold text-gray-900 mb-4">Топ кампании по эффективности</h3>
         <div className="space-y-4">
           {[
-            { name: 'Смартфоны - Поиск', roi: 285, spent: 45000, revenue: 128250 },
-            { name: 'Наушники - Каталог', roi: 220, spent: 32000, revenue: 70400 },
-            { name: 'Планшеты - Рекомендации', roi: 180, spent: 28000, revenue: 50400 },
-            { name: 'Аксессуары - Поиск', roi: 150, spent: 15000, revenue: 22500 }
+            { name: 'Поиск - бренд', roi: 285, spent: 45000, revenue: 128250 },
+            { name: 'Каталог - акции', roi: 220, spent: 32000, revenue: 70400 },
+            { name: 'Ремаркетинг', roi: 180, spent: 28000, revenue: 50400 },
+            { name: 'Поиск - общие', roi: 150, spent: 15000, revenue: 22500 }
           ].map((campaign, index) => (
             <div key={index} className="flex items-center justify-between p-4 bg-gray-50 rounded-lg">
               <div>
                 <p className="font-medium text-gray-900">{campaign.name}</p>
                 <p className="text-sm text-gray-500">
-                  Потрачено: {formatCurrency(campaign.spent)} • Выручка: {formatCurrency(campaign.revenue)}
+                  Потрачено: {formatCurrency(campaign.spent)} · Выручка: {formatCurrency(campaign.revenue)}
                 </p>
               </div>
               <div className="text-right">
@@ -277,5 +275,5 @@ export default function Advertising() {
         </div>
       </div>
     </div>
-  )
+  );
 }

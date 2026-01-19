@@ -1,4 +1,4 @@
-import React, { useState } from 'react'
+import React, { useState } from 'react';
 import {
   MagnifyingGlassIcon,
   FunnelIcon,
@@ -11,47 +11,45 @@ import {
   ChevronDownIcon,
   ChevronUpIcon,
   ArrowPathIcon,
-  TagIcon,
-  CubeIcon,
   CheckCircleIcon,
   ExclamationTriangleIcon,
   XCircleIcon
-} from '@heroicons/react/24/outline'
+} from '@heroicons/react/24/outline';
 
 interface Product {
-  id: string
-  sku: string
-  name: string
-  category: string
-  price: number
-  stock: number
-  reserved: number
-  available: number
-  status: 'active' | 'inactive' | 'out_of_stock'
-  marketplace: string
-  brand: string
-  description: string
-  images: string[]
-  lastUpdated: string
-  sales30d: number
+  id: string;
+  sku: string;
+  name: string;
+  category: string;
+  price: number;
+  stock: number;
+  reserved: number;
+  available: number;
+  status: 'active' | 'inactive' | 'out_of_stock';
+  marketplace: string;
+  brand: string;
+  description: string;
+  images: string[];
+  lastUpdated: string;
+  sales30d: number;
 }
 
 export default function Products() {
-  const [searchQuery, setSearchQuery] = useState('')
-  const [selectedCategory, setSelectedCategory] = useState('all')
-  const [selectedStatus, setSelectedStatus] = useState('all')
-  const [selectedMarketplace, setSelectedMarketplace] = useState('all')
-  const [sortField, setSortField] = useState('name')
-  const [sortDirection, setSortDirection] = useState<'asc' | 'desc'>('asc')
-  const [selectedProducts, setSelectedProducts] = useState<string[]>([])
-  const [showFilters, setShowFilters] = useState(false)
-  const [viewMode, setViewMode] = useState<'table' | 'cards'>('table')
+  const [searchQuery, setSearchQuery] = useState('');
+  const [selectedCategory, setSelectedCategory] = useState('all');
+  const [selectedStatus, setSelectedStatus] = useState('all');
+  const [selectedMarketplace, setSelectedMarketplace] = useState('all');
+  const [sortField, setSortField] = useState('name');
+  const [sortDirection, setSortDirection] = useState<'asc' | 'desc'>('asc');
+  const [selectedProducts, setSelectedProducts] = useState<string[]>([]);
+  const [showFilters, setShowFilters] = useState(false);
+  const [viewMode, setViewMode] = useState<'table' | 'cards'>('table');
 
   const products: Product[] = [
     {
       id: '1',
       sku: 'SM-A546B-128-BLK',
-      name: 'Смартфон Samsung Galaxy A54 5G 128GB Черный',
+      name: 'Смартфон Samsung Galaxy A54 5G 128GB, черный',
       category: 'Смартфоны',
       price: 24990,
       stock: 45,
@@ -60,25 +58,25 @@ export default function Products() {
       status: 'active',
       marketplace: 'Wildberries',
       brand: 'Samsung',
-      description: 'Смартфон Samsung Galaxy A54 5G с экраном 6.4" и камерой 50 МП',
-      images: ['📱'],
+      description: 'Смартфон с экраном 6.4" и камерой 50 МП.',
+      images: [],
       lastUpdated: '21.07.2025 14:30',
       sales30d: 23
     },
     {
       id: '2',
       sku: 'MTJV3-AIRPODS-PRO2',
-      name: 'Наушники Apple AirPods Pro 2-го поколения',
+      name: 'Наушники Apple AirPods Pro 2',
       category: 'Наушники',
       price: 19990,
       stock: 12,
       reserved: 2,
       available: 10,
       status: 'active',
-      marketplace: 'OZON',
+      marketplace: 'Ozon',
       brand: 'Apple',
-      description: 'Беспроводные наушники с активным шумоподавлением',
-      images: ['🎧'],
+      description: 'Беспроводные наушники с шумоподавлением.',
+      images: [],
       lastUpdated: '21.07.2025 13:15',
       sales30d: 18
     },
@@ -94,16 +92,16 @@ export default function Products() {
       status: 'active',
       marketplace: 'Яндекс Маркет',
       brand: 'ASUS',
-      description: 'Ноутбук с процессором Intel Core i5 и SSD 512GB',
-      images: ['💻'],
+      description: 'Intel Core i5, SSD 512GB.',
+      images: [],
       lastUpdated: '21.07.2025 12:45',
       sales30d: 12
     },
     {
       id: '4',
       sku: 'MI-BAND-7-BLK',
-      name: 'Умные часы Xiaomi Mi Band 7 Черный',
-      category: 'Умные часы',
+      name: 'Фитнес-браслет Xiaomi Mi Band 7',
+      category: 'Фитнес-браслеты',
       price: 3490,
       stock: 0,
       reserved: 0,
@@ -111,131 +109,130 @@ export default function Products() {
       status: 'out_of_stock',
       marketplace: 'Wildberries',
       brand: 'Xiaomi',
-      description: 'Фитнес-браслет с цветным AMOLED дисплеем',
-      images: ['⌚'],
+      description: 'AMOLED экран, мониторинг активности.',
+      images: [],
       lastUpdated: '20.07.2025 16:20',
       sales30d: 25
     },
     {
       id: '5',
       sku: 'IPHONE-15-128-BLU',
-      name: 'Смартфон Apple iPhone 15 128GB Синий',
+      name: 'Смартфон Apple iPhone 15 128GB, синий',
       category: 'Смартфоны',
       price: 79990,
       stock: 25,
       reserved: 5,
       available: 20,
       status: 'inactive',
-      marketplace: 'OZON',
+      marketplace: 'Ozon',
       brand: 'Apple',
-      description: 'Новейший iPhone с чипом A16 Bionic',
-      images: ['📱'],
+      description: 'Новый iPhone с процессором A16 Bionic.',
+      images: [],
       lastUpdated: '21.07.2025 11:30',
       sales30d: 8
     }
-  ]
+  ];
 
   const categories = [
     'Все категории',
     'Смартфоны',
-    'Наушники', 
+    'Наушники',
     'Ноутбуки',
-    'Умные часы',
-    'Планшеты',
-    'Аксессуары'
-  ]
+    'Фитнес-браслеты',
+    'Аксессуары',
+    'Электроника'
+  ];
 
   const getStatusIcon = (status: Product['status']) => {
     switch (status) {
       case 'active':
-        return <CheckCircleIcon className="h-4 w-4 text-green-500" />
+        return <CheckCircleIcon className="h-4 w-4 text-green-500" />;
       case 'inactive':
-        return <ExclamationTriangleIcon className="h-4 w-4 text-yellow-500" />
+        return <ExclamationTriangleIcon className="h-4 w-4 text-yellow-500" />;
       case 'out_of_stock':
-        return <XCircleIcon className="h-4 w-4 text-red-500" />
+        return <XCircleIcon className="h-4 w-4 text-red-500" />;
       default:
-        return null
+        return null;
     }
-  }
+  };
 
   const getStatusText = (status: Product['status']) => {
     switch (status) {
       case 'active':
-        return 'Активен'
+        return 'Активен';
       case 'inactive':
-        return 'Неактивен'
+        return 'Неактивен';
       case 'out_of_stock':
-        return 'Нет в наличии'
+        return 'Нет в наличии';
       default:
-        return status
+        return status;
     }
-  }
+  };
 
   const getStatusColor = (status: Product['status']) => {
     switch (status) {
       case 'active':
-        return 'bg-green-100 text-green-800 border-green-200'
+        return 'bg-green-100 text-green-800 border-green-200';
       case 'inactive':
-        return 'bg-yellow-100 text-yellow-800 border-yellow-200'
+        return 'bg-yellow-100 text-yellow-800 border-yellow-200';
       case 'out_of_stock':
-        return 'bg-red-100 text-red-800 border-red-200'
+        return 'bg-red-100 text-red-800 border-red-200';
       default:
-        return 'bg-gray-100 text-gray-800 border-gray-200'
+        return 'bg-gray-100 text-gray-800 border-gray-200';
     }
-  }
+  };
 
   const getStockColor = (available: number, stock: number) => {
-    if (available === 0) return 'text-red-600'
-    if (available < stock * 0.2) return 'text-yellow-600'
-    return 'text-green-600'
-  }
+    if (available === 0) return 'text-red-600';
+    if (available < stock * 0.2) return 'text-yellow-600';
+    return 'text-green-600';
+  };
 
   const handleSort = (field: string) => {
     if (sortField === field) {
-      setSortDirection(sortDirection === 'asc' ? 'desc' : 'asc')
+      setSortDirection(sortDirection === 'asc' ? 'desc' : 'asc');
     } else {
-      setSortField(field)
-      setSortDirection('asc')
+      setSortField(field);
+      setSortDirection('asc');
     }
-  }
+  };
 
   const handleSelectProduct = (productId: string) => {
-    setSelectedProducts(prev => 
-      prev.includes(productId) 
-        ? prev.filter(id => id !== productId)
-        : [...prev, productId]
-    )
-  }
+    setSelectedProducts((prev) =>
+      prev.includes(productId) ? prev.filter((id) => id !== productId) : [...prev, productId]
+    );
+  };
 
   const handleSelectAll = () => {
     if (selectedProducts.length === products.length) {
-      setSelectedProducts([])
+      setSelectedProducts([]);
     } else {
-      setSelectedProducts(products.map(product => product.id))
+      setSelectedProducts(products.map((product) => product.id));
     }
-  }
+  };
 
   const SortIcon = ({ field }: { field: string }) => {
-    if (sortField !== field) return null
-    return sortDirection === 'asc' ? 
-      <ChevronUpIcon className="h-4 w-4" /> : 
+    if (sortField !== field) return null;
+    return sortDirection === 'asc' ? (
+      <ChevronUpIcon className="h-4 w-4" />
+    ) : (
       <ChevronDownIcon className="h-4 w-4" />
-  }
+    );
+  };
 
   return (
     <div className="space-y-6">
-      {/* Заголовок страницы */}
       <div className="flex items-center justify-between">
         <div>
-          <h1 className="text-2xl font-bold text-gray-900">Номенклатура</h1>
+          <h1 className="text-2xl font-bold text-gray-900">Каталог товаров</h1>
           <p className="text-sm text-gray-600 mt-1">
-            Управление товарами и услугами
+            Управляйте карточками, ценами и остатками по маркетплейсам
           </p>
         </div>
         <div className="flex items-center space-x-3">
           <button className="inline-flex items-center px-4 py-2 border border-gray-300 rounded-md text-sm font-medium text-gray-700 bg-white hover:bg-gray-50">
             <DocumentArrowDownIcon className="h-4 w-4 mr-2" />
-            Экспорт
+            Выгрузить
           </button>
           <button className="inline-flex items-center px-4 py-2 border border-gray-300 rounded-md text-sm font-medium text-gray-700 bg-white hover:bg-gray-50">
             <DocumentArrowDownIcon className="h-4 w-4 mr-2" />
@@ -248,7 +245,6 @@ export default function Products() {
         </div>
       </div>
 
-      {/* Панель поиска и фильтров */}
       <div className="bg-white border border-gray-200 rounded-lg shadow-sm">
         <div className="p-4">
           <div className="flex items-center space-x-4">
@@ -256,7 +252,7 @@ export default function Products() {
               <MagnifyingGlassIcon className="h-5 w-5 absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400" />
               <input
                 type="text"
-                placeholder="Поиск по названию, артикулу, бренду..."
+                placeholder="Поиск по названию, SKU, бренду..."
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
                 className="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
@@ -265,8 +261,8 @@ export default function Products() {
             <button
               onClick={() => setShowFilters(!showFilters)}
               className={`inline-flex items-center px-4 py-2 border rounded-md text-sm font-medium ${
-                showFilters 
-                  ? 'border-blue-500 text-blue-700 bg-blue-50' 
+                showFilters
+                  ? 'border-blue-500 text-blue-700 bg-blue-50'
                   : 'border-gray-300 text-gray-700 bg-white hover:bg-gray-50'
               }`}
             >
@@ -277,8 +273,8 @@ export default function Products() {
               <button
                 onClick={() => setViewMode('table')}
                 className={`px-3 py-2 text-sm font-medium ${
-                  viewMode === 'table' 
-                    ? 'bg-blue-50 text-blue-700 border-r border-blue-200' 
+                  viewMode === 'table'
+                    ? 'bg-blue-50 text-blue-700 border-r border-blue-200'
                     : 'text-gray-700 hover:bg-gray-50 border-r border-gray-300'
                 }`}
               >
@@ -287,9 +283,7 @@ export default function Products() {
               <button
                 onClick={() => setViewMode('cards')}
                 className={`px-3 py-2 text-sm font-medium ${
-                  viewMode === 'cards' 
-                    ? 'bg-blue-50 text-blue-700' 
-                    : 'text-gray-700 hover:bg-gray-50'
+                  viewMode === 'cards' ? 'bg-blue-50 text-blue-700' : 'text-gray-700 hover:bg-gray-50'
                 }`}
               >
                 Карточки
@@ -301,20 +295,17 @@ export default function Products() {
             </button>
           </div>
 
-          {/* Расширенные фильтры */}
           {showFilters && (
             <div className="mt-4 pt-4 border-t border-gray-200">
               <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-1">
-                    Категория
-                  </label>
+                  <label className="block text-sm font-medium text-gray-700 mb-1">Категория</label>
                   <select
                     value={selectedCategory}
                     onChange={(e) => setSelectedCategory(e.target.value)}
                     className="w-full border border-gray-300 rounded-md px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
                   >
-                    {categories.map(category => (
+                    {categories.map((category) => (
                       <option key={category} value={category === 'Все категории' ? 'all' : category}>
                         {category}
                       </option>
@@ -322,24 +313,20 @@ export default function Products() {
                   </select>
                 </div>
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-1">
-                    Статус
-                  </label>
+                  <label className="block text-sm font-medium text-gray-700 mb-1">Статус</label>
                   <select
                     value={selectedStatus}
                     onChange={(e) => setSelectedStatus(e.target.value)}
                     className="w-full border border-gray-300 rounded-md px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
                   >
                     <option value="all">Все статусы</option>
-                    <option value="active">Активные</option>
-                    <option value="inactive">Неактивные</option>
+                    <option value="active">Активен</option>
+                    <option value="inactive">Неактивен</option>
                     <option value="out_of_stock">Нет в наличии</option>
                   </select>
                 </div>
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-1">
-                    Маркетплейс
-                  </label>
+                  <label className="block text-sm font-medium text-gray-700 mb-1">Маркетплейс</label>
                   <select
                     value={selectedMarketplace}
                     onChange={(e) => setSelectedMarketplace(e.target.value)}
@@ -347,19 +334,17 @@ export default function Products() {
                   >
                     <option value="all">Все маркетплейсы</option>
                     <option value="wildberries">Wildberries</option>
-                    <option value="ozon">OZON</option>
+                    <option value="ozon">Ozon</option>
                     <option value="yandex_market">Яндекс Маркет</option>
                     <option value="megamarket">Мегамаркет</option>
                   </select>
                 </div>
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-1">
-                    Остатки
-                  </label>
+                  <label className="block text-sm font-medium text-gray-700 mb-1">Остаток</label>
                   <select className="w-full border border-gray-300 rounded-md px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500">
-                    <option value="all">Все товары</option>
+                    <option value="all">Все</option>
                     <option value="in_stock">В наличии</option>
-                    <option value="low_stock">Заканчиваются</option>
+                    <option value="low_stock">Низкий остаток</option>
                     <option value="out_of_stock">Нет в наличии</option>
                   </select>
                 </div>
@@ -369,25 +354,21 @@ export default function Products() {
         </div>
       </div>
 
-      {/* Таблица товаров */}
       {viewMode === 'table' && (
         <div className="bg-white border border-gray-200 rounded-lg shadow-sm overflow-hidden">
-          {/* Панель массовых действий */}
           {selectedProducts.length > 0 && (
             <div className="px-6 py-3 bg-blue-50 border-b border-blue-200">
               <div className="flex items-center justify-between">
-                <span className="text-sm text-blue-700">
-                  Выбрано {selectedProducts.length} товаров
-                </span>
+                <span className="text-sm text-blue-700">Выбрано {selectedProducts.length} товаров</span>
                 <div className="flex items-center space-x-2">
                   <button className="inline-flex items-center px-3 py-1.5 border border-blue-300 rounded-md text-sm font-medium text-blue-700 bg-white hover:bg-blue-50">
                     Изменить статус
                   </button>
                   <button className="inline-flex items-center px-3 py-1.5 border border-blue-300 rounded-md text-sm font-medium text-blue-700 bg-white hover:bg-blue-50">
-                    Изменить цены
+                    Обновить цены
                   </button>
                   <button className="inline-flex items-center px-3 py-1.5 border border-blue-300 rounded-md text-sm font-medium text-blue-700 bg-white hover:bg-blue-50">
-                    Экспорт
+                    Выгрузить
                   </button>
                   <button className="inline-flex items-center px-3 py-1.5 border border-red-300 rounded-md text-sm font-medium text-red-700 bg-white hover:bg-red-50">
                     <TrashIcon className="h-4 w-4 mr-1" />
@@ -413,28 +394,28 @@ export default function Products() {
                   <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                     Фото
                   </th>
-                  <th 
+                  <th
                     className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider cursor-pointer hover:bg-gray-100"
                     onClick={() => handleSort('sku')}
                   >
                     <div className="flex items-center">
-                      Артикул
+                      SKU
                       <SortIcon field="sku" />
                     </div>
                   </th>
-                  <th 
+                  <th
                     className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider cursor-pointer hover:bg-gray-100"
                     onClick={() => handleSort('name')}
                   >
                     <div className="flex items-center">
-                      Наименование
+                      Название
                       <SortIcon field="name" />
                     </div>
                   </th>
                   <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                     Категория
                   </th>
-                  <th 
+                  <th
                     className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider cursor-pointer hover:bg-gray-100"
                     onClick={() => handleSort('price')}
                   >
@@ -444,7 +425,7 @@ export default function Products() {
                     </div>
                   </th>
                   <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                    Остатки
+                    Остаток
                   </th>
                   <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                     Статус
@@ -501,20 +482,22 @@ export default function Products() {
                       </div>
                     </td>
                     <td className="px-6 py-4 whitespace-nowrap">
-                      <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium border ${getStatusColor(product.status)}`}>
+                      <span
+                        className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium border ${getStatusColor(
+                          product.status
+                        )}`}
+                      >
                         {getStatusIcon(product.status)}
                         <span className="ml-1">{getStatusText(product.status)}</span>
                       </span>
                     </td>
                     <td className="px-6 py-4 whitespace-nowrap">
                       <div className="text-sm text-gray-900">{product.marketplace}</div>
-                      <div className="text-xs text-gray-500">
-                        Продано за 30д: {product.sales30d}
-                      </div>
+                      <div className="text-xs text-gray-500">Продажи за 30д: {product.sales30d}</div>
                     </td>
                     <td className="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
                       <div className="flex items-center justify-end space-x-2">
-                        <button className="text-blue-600 hover:text-blue-900" title="Просмотр">
+                        <button className="text-blue-600 hover:text-blue-900" title="Посмотреть">
                           <EyeIcon className="h-4 w-4" />
                         </button>
                         <button className="text-gray-600 hover:text-gray-900" title="Редактировать">
@@ -531,12 +514,9 @@ export default function Products() {
             </table>
           </div>
 
-          {/* Пагинация */}
           <div className="px-6 py-3 border-t border-gray-200 bg-gray-50">
             <div className="flex items-center justify-between">
-              <div className="text-sm text-gray-700">
-                Показано 1-5 из 1,234 записей
-              </div>
+              <div className="text-sm text-gray-700">Показано 1-5 из 1 234 товаров</div>
               <div className="flex items-center space-x-2">
                 <button className="px-3 py-1 border border-gray-300 rounded-md text-sm font-medium text-gray-700 bg-white hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed">
                   Предыдущая
@@ -565,5 +545,5 @@ export default function Products() {
         </div>
       )}
     </div>
-  )
+  );
 }

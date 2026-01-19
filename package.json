@@ -18,7 +18,7 @@
     "dist:win": "npm run build && electron-builder --win --x64",
     "dist:portable": "npm run build && electron-builder --win portable",
     "pack": "npm run build && electron-builder --dir",
-    "postinstall": "electron-builder install-app-deps"
+    "postinstall": "node -e \"if(!process.env.SKIP_ELECTRON_REBUILD){require('child_process').execSync('electron-builder install-app-deps',{stdio:'inherit'})}else{console.log('Skipping electron rebuild');}\""
   },
   "dependencies": {
     "@heroicons/react": "^2.2.0",
@@ -33,6 +33,7 @@
     "multer": "^1.4.5-lts.1",
     "node-cron": "^3.0.3",
     "nodemon": "^3.0.2",
+    "sql.js": "^1.10.3",
     "typescript": "^5.3.3"
   },
   "devDependencies": {

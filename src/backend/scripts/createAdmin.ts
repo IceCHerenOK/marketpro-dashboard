@@ -1,5 +1,5 @@
-import bcrypt from 'bcryptjs';;
-import {  db  } from '../database/init';;
+import bcrypt from 'bcryptjs';
+import initDatabase, { db } from '../database/init';
 
 async function createAdminUser() {
   const email = 'chubarov.a@azotstore.ru';
@@ -7,65 +7,48 @@ async function createAdminUser() {
   const username = 'admin';
 
   try {
-    // Проверяем, существует ли пользователь
-    db.get('SELECT id FROM users WHERE email = ?', [email], async function(err: any, row: any) {
+    await initDatabase();
+
+    db.get('SELECT id FROM users WHERE email = ?', [email], async function (err: any, row: any) {
       if (err) {
-        console.error('Ошибка базы данных:', err);
+        console.error('Database error:', err);
         process.exit(1);
       }
 
       if (row) {
-        console.log('Пользователь уже существует. Обновляем пароль...');
-        
-        // Хешируем пароль
-        const saltRounds = 10;
-        const hashedPassword = await bcrypt.hash(password, saltRounds);
-        
-        // Обновляем пароль
+        const hashedPassword = await bcrypt.hash(password, 10);
         db.run(
           'UPDATE users SET password_hash = ? WHERE email = ?',
           [hashedPassword, email],
-          function(err: any) {
-            if (err) {
-              console.error('Ошибка обновления пароля:', err);
+          function (updateErr: any) {
+            if (updateErr) {
+              console.error('Failed to update password:', updateErr);
               process.exit(1);
             }
-            
-            console.log('Пароль успешно обновлен!');
+            console.log('Admin password updated.');
             process.exit(0);
           }
         );
       } else {
-        console.log('Создаем нового администратора...');
-        
-        // Хешируем пароль
-        const saltRounds = 10;
-        const hashedPassword = await bcrypt.hash(password, saltRounds);
-        
-        // Создаем пользователя
+        const hashedPassword = await bcrypt.hash(password, 10);
         db.run(
           'INSERT INTO users (username, email, password_hash) VALUES (?, ?, ?)',
           [username, email, hashedPassword],
-          function(err: any) {
-            if (err) {
-              console.error('Ошибка создания пользователя:', err);
+          function (insertErr: any) {
+            if (insertErr) {
+              console.error('Failed to create admin user:', insertErr);
               process.exit(1);
             }
-            
-            console.log('Администратор успешно создан!');
-            console.log(`ID: ${(this as any).lastID}`);
-            console.log(`Email: ${email}`);
-            console.log(`Пароль: ${password}`);
+            console.log(`Admin created: ${email}`);
             process.exit(0);
           }
         );
       }
     });
   } catch (error) {
-    console.error('Ошибка:', error);
+    console.error('Failed to create admin user:', error);
     process.exit(1);
   }
 }
 
-// Запускаем функцию создания администратора
 createAdminUser();

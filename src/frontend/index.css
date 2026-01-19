@@ -1,4 +1,4 @@
-@import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;400;500;600;700&display=swap');
 
 @tailwind base;
 @tailwind components;
@@ -6,30 +6,30 @@
 
 :root {
   /* Основные цвета */
-  --primary: #6366f1;
-  --primary-hover: #4f46e5;
-  --primary-light: #e0e7ff;
-  --primary-dark: #4338ca;
+  --primary: #0f766e;
+  --primary-hover: #0d9488;
+  --primary-light: #ccfbf1;
+  --primary-dark: #115e59;
   
   /* Градиенты */
-  --gradient-primary: linear-gradient(135deg, #6366f1 0%, #8b5cf6 100%);
-  --gradient-secondary: linear-gradient(135deg, #0ea5e9 0%, #3b82f6 100%);
+  --gradient-primary: linear-gradient(135deg, #0f766e 0%, #0d9488 100%);
+  --gradient-secondary: linear-gradient(135deg, #f97316 0%, #fb923c 100%);
   --gradient-success: linear-gradient(135deg, #10b981 0%, #059669 100%);
   --gradient-warning: linear-gradient(135deg, #f59e0b 0%, #d97706 100%);
   --gradient-danger: linear-gradient(135deg, #ef4444 0%, #dc2626 100%);
   
   /* Акцентные цвета */
-  --secondary: #0ea5e9;
-  --secondary-hover: #0284c7;
-  --secondary-light: #e0f2fe;
+  --secondary: #f97316;
+  --secondary-hover: #ea580c;
+  --secondary-light: #ffedd5;
   --success: #10b981;
   --success-light: #d1fae5;
   --warning: #f59e0b;
   --warning-light: #fef3c7;
   --danger: #ef4444;
   --danger-light: #fee2e2;
-  --info: #6366f1;
-  --info-light: #e0e7ff;
+  --info: #0ea5e9;
+  --info-light: #e0f2fe;
   
   /* Тени */
   --shadow-sm: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
@@ -75,6 +75,8 @@
   --card-bg: #ffffff;
   --sidebar-bg: #ffffff;
   --header-bg: rgba(255, 255, 255, 0.9);
+  --card-shadow: 0 18px 30px -28px rgba(15, 23, 42, 0.35);
+  --card-shadow-hover: 0 24px 40px -30px rgba(15, 23, 42, 0.45);
   
   /* Поля ввода */
   --input-bg: #ffffff;
@@ -145,9 +147,9 @@
   --info-gradient: linear-gradient(135deg, #3b82f6 0%, #2563eb 100%);
   
   /* Основные градиенты */
-  --primary-gradient: linear-gradient(135deg, #4f46e5 0%, #4338ca 100%);
-  --secondary-gradient: linear-gradient(135deg, #3b82f6 0%, #2563eb 100%);
-  --accent-gradient: linear-gradient(135deg, #8b5cf6 0%, #6d28d9 100%);
+  --primary-gradient: linear-gradient(135deg, #0f766e 0%, #0d9488 100%);
+  --secondary-gradient: linear-gradient(135deg, #f97316 0%, #ea580c 100%);
+  --accent-gradient: linear-gradient(135deg, #0891b2 0%, #0e7490 100%);
 }
 
 .dark-theme {
@@ -171,6 +173,8 @@
   --card-bg: #1e293b;
   --sidebar-bg: #0f172a;
   --header-bg: rgba(15, 23, 42, 0.9);
+  --card-shadow: 0 18px 30px -28px rgba(0, 0, 0, 0.6);
+  --card-shadow-hover: 0 24px 40px -30px rgba(0, 0, 0, 0.7);
   
   /* Поля ввода */
   --input-bg: #334155;
@@ -241,21 +245,102 @@
   --info-gradient: linear-gradient(135deg, #3b82f6 0%, #2563eb 100%);
   
   /* Основные градиенты */
-  --primary-gradient: linear-gradient(135deg, #4f46e5 0%, #4338ca 100%);
-  --secondary-gradient: linear-gradient(135deg, #3b82f6 0%, #2563eb 100%);
-  --accent-gradient: linear-gradient(135deg, #8b5cf6 0%, #6d28d9 100%);
+  --primary-gradient: linear-gradient(135deg, #0f766e 0%, #0d9488 100%);
+  --secondary-gradient: linear-gradient(135deg, #f97316 0%, #ea580c 100%);
+  --accent-gradient: linear-gradient(135deg, #0891b2 0%, #0e7490 100%);
 }
 
 @layer base {
   html {
-    font-family: 'Inter', system-ui, sans-serif;
+    font-family: 'Space Grotesk', 'Segoe UI', sans-serif;
   }
   
   body {
     @apply transition-colors duration-200;
     background-color: var(--bg-secondary);
+    background-image:
+      radial-gradient(900px circle at 10% -10%, rgba(15, 118, 110, 0.14), transparent 55%),
+      radial-gradient(800px circle at 90% 10%, rgba(249, 115, 22, 0.12), transparent 55%);
     color: var(--text-primary);
   }
+}
+
+.command-bar {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12px;
+  align-items: center;
+  justify-content: space-between;
+  padding: 10px 24px;
+  border-bottom: 1px solid var(--border-color);
+  background: linear-gradient(135deg, rgba(255, 255, 255, 0.95), rgba(249, 250, 251, 0.9));
+  backdrop-filter: blur(10px);
+}
+
+.command-group {
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+
+.command-button {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 8px 14px;
+  border-radius: 999px;
+  border: 1px solid var(--border-color);
+  background: var(--card-bg);
+  color: var(--text-secondary);
+  font-size: 13px;
+  font-weight: 600;
+  transition: all 0.2s ease;
+  box-shadow: var(--card-shadow);
+}
+
+.command-button:hover {
+  color: var(--text-primary);
+  transform: translateY(-1px);
+  box-shadow: var(--card-shadow-hover);
+}
+
+.status-bar {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 8px 24px;
+  border-top: 1px solid var(--border-color);
+  background: var(--bg-tertiary);
+  font-size: 12px;
+  color: var(--text-tertiary);
+}
+
+.dark-theme .command-bar {
+  background: linear-gradient(135deg, rgba(15, 23, 42, 0.95), rgba(30, 41, 59, 0.9));
+}
+
+.knowledge-content h1,
+.knowledge-content h2,
+.knowledge-content h3 {
+  font-weight: 600;
+  margin-top: 16px;
+  margin-bottom: 8px;
+}
+
+.knowledge-content p {
+  margin-bottom: 10px;
+  line-height: 1.6;
+  color: var(--text-secondary);
+}
+
+.knowledge-content ul {
+  margin-left: 18px;
+  list-style: disc;
+  color: var(--text-secondary);
+}
+
+.knowledge-content strong {
+  color: var(--text-primary);
 }
 
 @layer components {

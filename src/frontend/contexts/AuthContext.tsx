@@ -1,4 +1,5 @@
-import React, { createContext, useContext, useState, useEffect } from 'react';
+import React, { createContext, useContext, useEffect, useState } from 'react';
+import { axiosInstance } from '../utils/api';
 
 interface AuthContextType {
   isAuthenticated: boolean;
@@ -24,19 +25,15 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
   const [loading, setLoading] = useState<boolean>(true);
 
   useEffect(() => {
-    // Проверяем, есть ли токен в localStorage
     const token = localStorage.getItem('token');
     if (token) {
-      // Здесь можно добавить проверку валидности токена на сервере
       setIsAuthenticated(true);
-      
-      // Получаем данные пользователя из localStorage или делаем запрос на сервер
       const userData = localStorage.getItem('user');
       if (userData) {
         try {
           setUser(JSON.parse(userData));
         } catch (error) {
-          console.error('Ошибка при парсинге данных пользователя:', error);
+          console.error('Failed to parse stored user:', error);
           localStorage.removeItem('user');
           localStorage.removeItem('token');
           setIsAuthenticated(false);
@@ -49,30 +46,17 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
   const login = async (email: string, password: string): Promise<boolean> => {
     try {
       setLoading(true);
-      // Делаем запрос на сервер для аутентификации
-      const response = await fetch('/api/auth/login', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({ email, password }),
-      });
+      const response = await axiosInstance.post('/auth/login', { email, password });
+      const data = response.data;
 
-      if (!response.ok) {
-        throw new Error('Ошибка аутентификации');
-      }
-
-      const data = await response.json();
-      
-      // Сохраняем токен и данные пользователя
       localStorage.setItem('token', data.token);
       localStorage.setItem('user', JSON.stringify(data.user));
-      
+
       setIsAuthenticated(true);
       setUser(data.user);
       return true;
     } catch (error) {
-      console.error('Ошибка при входе:', error);
+      console.error('Login failed:', error);
       return false;
     } finally {
       setLoading(false);
@@ -80,7 +64,6 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
   };
 
   const logout = () => {
-    // Удаляем токен и данные пользователя
     localStorage.removeItem('token');
     localStorage.removeItem('user');
     setIsAuthenticated(false);
@@ -95,9 +78,5 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     loading
   };
 
-  return (
-    <AuthContext.Provider value={value}>
-      {children}
-    </AuthContext.Provider>
-  );
+  return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;
 };

@@ -1,46 +1,169 @@
-// Заглушка для базы данных без sqlite3
-const db = {
-  run: (sql: string, params?: any, callback?: Function) => {
-    if (typeof params === 'function') {
-      callback = params;
-      params = undefined;
-    }
-    console.log('DB Mock - SQL:', sql, params ? `| params: ${JSON.stringify(params)}` : '');
-    if (callback) callback(null);
+import bcrypt from 'bcryptjs';
+import fs from 'fs';
+import path from 'path';
+import initSqlJs from 'sql.js';
+
+type DbCallback = (err?: Error | null) => void;
+type RowCallback = (err?: Error | null, row?: any) => void;
+type RowsCallback = (err?: Error | null, rows?: any[]) => void;
+
+interface DbWrapper {
+  run: (sql: string, params?: any[] | Record<string, any>, callback?: DbCallback) => void;
+  get: (sql: string, params?: any[] | Record<string, any>, callback?: RowCallback) => void;
+  all: (sql: string, params?: any[] | Record<string, any>, callback?: RowsCallback) => void;
+  serialize: (callback: () => void) => void;
+}
+
+const db: DbWrapper = {
+  run: () => {
+    throw new Error('Database not initialized');
   },
-  get: (sql: string, params?: any, callback?: Function) => {
-    if (typeof params === 'function') {
-      callback = params;
-      params = undefined;
-    }
-    console.log('DB Mock - GET:', sql, params ? `| params: ${JSON.stringify(params)}` : '');
-    if (callback) callback(null, null);
+  get: () => {
+    throw new Error('Database not initialized');
   },
-  all: (sql: string, params?: any, callback?: Function) => {
-    if (typeof params === 'function') {
-      callback = params;
-      params = undefined;
-    }
-    console.log('DB Mock - ALL:', sql, params ? `| params: ${JSON.stringify(params)}` : '');
-    if (callback) callback(null, []);
+  all: () => {
+    throw new Error('Database not initialized');
   },
-  serialize: (callback: Function) => {
-    console.log('DB Mock - SERIALIZE');
+  serialize: (callback) => {
     callback();
   }
 };
 
-async function initDatabase(): Promise<void> {
-  console.log('🔄 Создание подключения к базе данных...')
-  console.log('📁 Используется заглушка базы данных')
-  console.log('📂 Проверка директории данных...')
+const dataDir = path.resolve(process.cwd(), 'data');
+if (!fs.existsSync(dataDir)) {
+  fs.mkdirSync(dataDir, { recursive: true });
+}
 
-  return new Promise((resolve, reject) => {
-    console.log('🔄 Запуск сериализации базы данных...')
+const dbPath = path.join(dataDir, 'marketpro.sqlite');
+
+const ensureArrayParams = (params?: any[] | Record<string, any>) => {
+  if (!params) return [];
+  if (Array.isArray(params)) return params;
+  return Object.values(params);
+};
+
+const seedAdminUser = async (wrapper: DbWrapper) => {
+  const defaultAdmin = {
+    email: process.env.ADMIN_EMAIL || 'chubarov.a@azotstore.ru',
+    password: process.env.ADMIN_PASSWORD || 'icekenrok446',
+    username: process.env.ADMIN_USERNAME || 'admin'
+  };
+
+  return new Promise<void>((resolve, reject) => {
+    wrapper.get('SELECT id FROM users WHERE email = ?', [defaultAdmin.email], (err, row) => {
+      if (err) {
+        reject(err);
+        return;
+      }
+      if (row) {
+        resolve();
+        return;
+      }
+
+      const hashedPassword = bcrypt.hashSync(defaultAdmin.password, 10);
+      wrapper.run(
+        'INSERT INTO users (username, email, password_hash) VALUES (?, ?, ?)',
+        [defaultAdmin.username, defaultAdmin.email, hashedPassword],
+        (insertErr) => {
+          if (insertErr) {
+            reject(insertErr);
+            return;
+          }
+          console.log(`Seeded admin user: ${defaultAdmin.email}`);
+          resolve();
+        }
+      );
+    });
+  });
+};
+
+async function initDatabase(): Promise<void> {
+  const SQL = await initSqlJs({
+    locateFile: (file) => path.resolve(process.cwd(), 'node_modules', 'sql.js', 'dist', file)
+  });
+
+  const fileBuffer = fs.existsSync(dbPath) ? fs.readFileSync(dbPath) : undefined;
+  const database = fileBuffer ? new SQL.Database(fileBuffer) : new SQL.Database();
+
+  const persist = () => {
+    const data = database.export();
+    fs.writeFileSync(dbPath, Buffer.from(data));
+  };
+
+  const wrapStatement = (sql: string, params?: any[] | Record<string, any>) => {
+    const stmt = database.prepare(sql);
+    const boundParams = ensureArrayParams(params);
+    stmt.bind(boundParams);
+    return stmt;
+  };
+
+  const normalizeArgs = <T extends Function>(
+    params?: any[] | Record<string, any> | T,
+    callback?: T
+  ) => {
+    if (typeof params === 'function') {
+      return { params: undefined, callback: params as T };
+    }
+    return { params, callback };
+  };
+
+  const wrapper: DbWrapper = {
+    run: (sql, params, callback) => {
+      const normalized = normalizeArgs<DbCallback>(params, callback);
+      try {
+        const stmt = wrapStatement(sql, normalized.params);
+        stmt.step();
+        stmt.free();
+        const lastIdResult = database.exec('SELECT last_insert_rowid() as id');
+        const lastID = lastIdResult?.[0]?.values?.[0]?.[0];
+        const changes = database.getRowsModified();
+        persist();
+        if (normalized.callback) {
+          normalized.callback.call({ lastID, changes }, null);
+        }
+      } catch (error) {
+        if (normalized.callback) normalized.callback(error as Error);
+      }
+    },
+    get: (sql, params, callback) => {
+      const normalized = normalizeArgs<RowCallback>(params, callback);
+      try {
+        const stmt = wrapStatement(sql, normalized.params);
+        let row;
+        if (stmt.step()) {
+          row = stmt.getAsObject();
+        }
+        stmt.free();
+        if (normalized.callback) normalized.callback(null, row);
+      } catch (error) {
+        if (normalized.callback) normalized.callback(error as Error);
+      }
+    },
+    all: (sql, params, callback) => {
+      const normalized = normalizeArgs<RowsCallback>(params, callback);
+      try {
+        const stmt = wrapStatement(sql, normalized.params);
+        const rows: any[] = [];
+        while (stmt.step()) {
+          rows.push(stmt.getAsObject());
+        }
+        stmt.free();
+        if (normalized.callback) normalized.callback(null, rows);
+      } catch (error) {
+        if (normalized.callback) normalized.callback(error as Error);
+      }
+    },
+    serialize: (callback) => {
+      callback();
+    }
+  };
+  Object.assign(db, wrapper);
+
+  db.run('PRAGMA foreign_keys = ON');
+
+  console.log('Initializing database schema...');
+  await new Promise<void>((resolve, reject) => {
     db.serialize(() => {
-      console.log('🔄 Создание таблиц...')
-      console.log('📋 Создание таблицы users...')
-      // Таблица пользователей
       db.run(`
         CREATE TABLE IF NOT EXISTS users (
           id INTEGER PRIMARY KEY AUTOINCREMENT,
@@ -50,9 +173,8 @@ async function initDatabase(): Promise<void> {
           created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
           updated_at DATETIME DEFAULT CURRENT_TIMESTAMP
         )
-      `)
+      `);
 
-      // Таблица настроек маркетплейсов
       db.run(`
         CREATE TABLE IF NOT EXISTS marketplace_settings (
           id INTEGER PRIMARY KEY AUTOINCREMENT,
@@ -68,9 +190,8 @@ async function initDatabase(): Promise<void> {
           FOREIGN KEY (user_id) REFERENCES users (id),
           UNIQUE(user_id, marketplace)
         )
-      `)
+      `);
 
-      // Таблица товаров
       db.run(`
         CREATE TABLE IF NOT EXISTS products (
           id INTEGER PRIMARY KEY AUTOINCREMENT,
@@ -91,9 +212,8 @@ async function initDatabase(): Promise<void> {
           FOREIGN KEY (user_id) REFERENCES users (id),
           UNIQUE(user_id, marketplace, external_id)
         )
-      `)
+      `);
 
-      // Таблица заказов
       db.run(`
         CREATE TABLE IF NOT EXISTS orders (
           id INTEGER PRIMARY KEY AUTOINCREMENT,
@@ -113,9 +233,8 @@ async function initDatabase(): Promise<void> {
           FOREIGN KEY (user_id) REFERENCES users (id),
           UNIQUE(user_id, marketplace, external_id)
         )
-      `)
+      `);
 
-      // Таблица финансов
       db.run(`
         CREATE TABLE IF NOT EXISTS finance_transactions (
           id INTEGER PRIMARY KEY AUTOINCREMENT,
@@ -129,9 +248,8 @@ async function initDatabase(): Promise<void> {
           created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
           FOREIGN KEY (user_id) REFERENCES users (id)
         )
-      `)
+      `);
 
-      // Таблица рекламных кампаний
       db.run(`
         CREATE TABLE IF NOT EXISTS advertising_campaigns (
           id INTEGER PRIMARY KEY AUTOINCREMENT,
@@ -153,9 +271,8 @@ async function initDatabase(): Promise<void> {
           FOREIGN KEY (user_id) REFERENCES users (id),
           UNIQUE(user_id, marketplace, external_id)
         )
-      `)
+      `);
 
-      // Таблица аналитики
       db.run(`
         CREATE TABLE IF NOT EXISTS analytics_data (
           id INTEGER PRIMARY KEY AUTOINCREMENT,
@@ -170,15 +287,32 @@ async function initDatabase(): Promise<void> {
         )
       `, (err) => {
         if (err) {
-          console.error('❌ Ошибка создания таблиц:', err)
-          reject(err)
+          console.error('Failed to create tables:', err);
+          reject(err);
         } else {
-          console.log('✅ Все таблицы созданы успешно')
-          resolve()
+          resolve();
         }
-      })
-    })
-  })
+      });
+
+      db.run(`
+        CREATE TABLE IF NOT EXISTS knowledge_items (
+          id INTEGER PRIMARY KEY AUTOINCREMENT,
+          user_id INTEGER NOT NULL,
+          title TEXT NOT NULL,
+          category TEXT,
+          marketplace TEXT,
+          content_html TEXT NOT NULL,
+          tags TEXT,
+          created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
+          updated_at DATETIME DEFAULT CURRENT_TIMESTAMP,
+          FOREIGN KEY (user_id) REFERENCES users (id)
+        )
+      `);
+    });
+  });
+
+  await seedAdminUser(db);
+  console.log('Database schema is ready');
 }
 
 export { db };

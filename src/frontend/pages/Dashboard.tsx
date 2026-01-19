@@ -1,4 +1,4 @@
-import React, { useState } from 'react'
+import React, { useState } from 'react';
 import {
   ChartBarIcon,
   CurrencyDollarIcon,
@@ -8,7 +8,6 @@ import {
   ArrowDownIcon,
   EyeIcon,
   PencilIcon,
-  TrashIcon,
   PlusIcon,
   FunnelIcon,
   MagnifyingGlassIcon,
@@ -20,39 +19,39 @@ import {
   CheckCircleIcon,
   ClockIcon,
   XCircleIcon
-} from '@heroicons/react/24/outline'
+} from '@heroicons/react/24/outline';
 
 interface StatCard {
-  title: string
-  value: string
-  change: number
-  icon: React.ComponentType<any>
-  color: string
+  title: string;
+  value: string;
+  change: number;
+  icon: React.ComponentType<any>;
+  color: string;
 }
 
 interface Order {
-  id: string
-  number: string
-  date: string
-  customer: string
-  amount: number
-  status: 'new' | 'processing' | 'shipped' | 'delivered' | 'cancelled'
-  marketplace: string
+  id: string;
+  number: string;
+  date: string;
+  customer: string;
+  amount: number;
+  status: 'new' | 'processing' | 'shipped' | 'delivered' | 'cancelled';
+  marketplace: string;
 }
 
 interface Product {
-  id: string
-  name: string
-  sku: string
-  price: number
-  stock: number
-  sales: number
-  marketplace: string
+  id: string;
+  name: string;
+  sku: string;
+  price: number;
+  stock: number;
+  sales: number;
+  marketplace: string;
 }
 
 export default function Dashboard() {
-  const [selectedPeriod, setSelectedPeriod] = useState('today')
-  const [searchQuery, setSearchQuery] = useState('')
+  const [selectedPeriod, setSelectedPeriod] = useState('today');
+  const [searchQuery, setSearchQuery] = useState('');
 
   const stats: StatCard[] = [
     {
@@ -70,7 +69,7 @@ export default function Dashboard() {
       color: 'bg-blue-500'
     },
     {
-      title: 'Товары в продаже',
+      title: 'Товары в наличии',
       value: '1 234',
       change: -2.1,
       icon: CubeIcon,
@@ -83,14 +82,14 @@ export default function Dashboard() {
       icon: ChartBarIcon,
       color: 'bg-orange-500'
     }
-  ]
+  ];
 
   const recentOrders: Order[] = [
     {
       id: '1',
       number: '000000123',
       date: '21.07.2025 14:30',
-      customer: 'Иванов Иван Иванович',
+      customer: 'Иван Петров',
       amount: 3450,
       status: 'new',
       marketplace: 'Wildberries'
@@ -99,16 +98,16 @@ export default function Dashboard() {
       id: '2',
       number: '000000124',
       date: '21.07.2025 13:15',
-      customer: 'Петрова Анна Сергеевна',
+      customer: 'Ольга Смирнова',
       amount: 1890,
       status: 'processing',
-      marketplace: 'OZON'
+      marketplace: 'Ozon'
     },
     {
       id: '3',
       number: '000000125',
       date: '21.07.2025 12:45',
-      customer: 'Сидоров Петр Александрович',
+      customer: 'Алексей Морозов',
       amount: 5670,
       status: 'shipped',
       marketplace: 'Яндекс Маркет'
@@ -117,7 +116,7 @@ export default function Dashboard() {
       id: '4',
       number: '000000126',
       date: '21.07.2025 11:20',
-      customer: 'Козлова Мария Викторовна',
+      customer: 'Мария Белова',
       amount: 2340,
       status: 'delivered',
       marketplace: 'Wildberries'
@@ -126,12 +125,12 @@ export default function Dashboard() {
       id: '5',
       number: '000000127',
       date: '21.07.2025 10:10',
-      customer: 'Морозов Алексей Дмитриевич',
+      customer: 'Сергей Орлов',
       amount: 4120,
       status: 'cancelled',
-      marketplace: 'OZON'
+      marketplace: 'Ozon'
     }
-  ]
+  ];
 
   const topProducts: Product[] = [
     {
@@ -145,12 +144,12 @@ export default function Dashboard() {
     },
     {
       id: '2',
-      name: 'Наушники Apple AirPods Pro 2-го поколения',
+      name: 'Наушники Apple AirPods Pro 2',
       sku: 'MTJV3',
       price: 19990,
       stock: 12,
       sales: 18,
-      marketplace: 'OZON'
+      marketplace: 'Ozon'
     },
     {
       id: '3',
@@ -161,67 +160,66 @@ export default function Dashboard() {
       sales: 12,
       marketplace: 'Яндекс Маркет'
     }
-  ]
+  ];
 
   const getStatusIcon = (status: Order['status']) => {
     switch (status) {
       case 'new':
-        return <ExclamationTriangleIcon className="h-4 w-4 text-yellow-500" />
+        return <ExclamationTriangleIcon className="h-4 w-4 text-yellow-500" />;
       case 'processing':
-        return <ClockIcon className="h-4 w-4 text-blue-500" />
+        return <ClockIcon className="h-4 w-4 text-blue-500" />;
       case 'shipped':
-        return <ArrowPathIcon className="h-4 w-4 text-purple-500" />
+        return <ArrowPathIcon className="h-4 w-4 text-purple-500" />;
       case 'delivered':
-        return <CheckCircleIcon className="h-4 w-4 text-green-500" />
+        return <CheckCircleIcon className="h-4 w-4 text-green-500" />;
       case 'cancelled':
-        return <XCircleIcon className="h-4 w-4 text-red-500" />
+        return <XCircleIcon className="h-4 w-4 text-red-500" />;
       default:
-        return null
+        return null;
     }
-  }
+  };
 
   const getStatusText = (status: Order['status']) => {
     switch (status) {
       case 'new':
-        return 'Новый'
+        return 'Новый';
       case 'processing':
-        return 'В обработке'
+        return 'В обработке';
       case 'shipped':
-        return 'Отправлен'
+        return 'Отгружен';
       case 'delivered':
-        return 'Доставлен'
+        return 'Доставлен';
       case 'cancelled':
-        return 'Отменен'
+        return 'Отменен';
       default:
-        return status
+        return status;
     }
-  }
+  };
 
   const getStatusColor = (status: Order['status']) => {
     switch (status) {
       case 'new':
-        return 'bg-yellow-100 text-yellow-800 border-yellow-200'
+        return 'bg-yellow-100 text-yellow-800 border-yellow-200';
       case 'processing':
-        return 'bg-blue-100 text-blue-800 border-blue-200'
+        return 'bg-blue-100 text-blue-800 border-blue-200';
       case 'shipped':
-        return 'bg-purple-100 text-purple-800 border-purple-200'
+        return 'bg-purple-100 text-purple-800 border-purple-200';
       case 'delivered':
-        return 'bg-green-100 text-green-800 border-green-200'
+        return 'bg-green-100 text-green-800 border-green-200';
       case 'cancelled':
-        return 'bg-red-100 text-red-800 border-red-200'
+        return 'bg-red-100 text-red-800 border-red-200';
       default:
-        return 'bg-gray-100 text-gray-800 border-gray-200'
+        return 'bg-gray-100 text-gray-800 border-gray-200';
     }
-  }
+  };
 
   return (
     <div className="space-y-6">
-      {/* Заголовок страницы */}
       <div className="flex items-center justify-between">
         <div>
           <h1 className="text-2xl font-bold text-gray-900">Рабочий стол</h1>
           <p className="text-sm text-gray-600 mt-1">
-            Обзор основных показателей и последних операций
+            Ключевые показатели и последние операции за выбранный период
           </p>
         </div>
         <div className="flex items-center space-x-3">
@@ -242,7 +240,6 @@ export default function Dashboard() {
         </div>
       </div>
 
-      {/* Карточки статистики */}
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
         {stats.map((stat, index) => (
           <div key={index} className="bg-white border border-gray-200 rounded-lg p-6 shadow-sm">
@@ -256,9 +253,11 @@ export default function Dashboard() {
                   <p className="text-2xl font-bold text-gray-900">{stat.value}</p>
                 </div>
               </div>
-              <div className={`flex items-center text-sm ${
-                stat.change >= 0 ? 'text-green-600' : 'text-red-600'
-              }`}>
+              <div
+                className={`flex items-center text-sm ${
+                  stat.change >= 0 ? 'text-green-600' : 'text-red-600'
+                }`}
+              >
                 {stat.change >= 0 ? (
                   <ArrowUpIcon className="h-4 w-4 mr-1" />
                 ) : (
@@ -272,18 +271,17 @@ export default function Dashboard() {
       </div>
 
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-        {/* Последние заказы */}
         <div className="lg:col-span-2">
           <div className="bg-white border border-gray-200 rounded-lg shadow-sm">
             <div className="px-6 py-4 border-b border-gray-200">
               <div className="flex items-center justify-between">
-                <h2 className="text-lg font-semibold text-gray-900">Заказы покупателей</h2>
+                <h2 className="text-lg font-semibold text-gray-900">Последние заказы</h2>
                 <div className="flex items-center space-x-2">
                   <div className="relative">
                     <MagnifyingGlassIcon className="h-4 w-4 absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400" />
                     <input
                       type="text"
-                      placeholder="Поиск заказов..."
+                      placeholder="Поиск по заказам..."
                       value={searchQuery}
                       onChange={(e) => setSearchQuery(e.target.value)}
                       className="pl-9 pr-3 py-1.5 border border-gray-300 rounded-md text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
@@ -295,12 +293,12 @@ export default function Dashboard() {
                   </button>
                   <button className="inline-flex items-center px-3 py-1.5 bg-blue-600 text-white rounded-md text-sm font-medium hover:bg-blue-700">
                     <PlusIcon className="h-4 w-4 mr-1" />
-                    Создать
+                    Новый заказ
                   </button>
                 </div>
               </div>
             </div>
-            
+
             <div className="overflow-x-auto">
               <table className="min-w-full divide-y divide-gray-200">
                 <thead className="bg-gray-50">
@@ -344,11 +342,18 @@ export default function Dashboard() {
                       </td>
                       <td className="px-6 py-4 whitespace-nowrap">
                         <div className="text-sm font-medium text-gray-900">
-                          {order.amount.toLocaleString('ru-RU', { style: 'currency', currency: 'RUB' })}
+                          {order.amount.toLocaleString('ru-RU', {
+                            style: 'currency',
+                            currency: 'RUB'
+                          })}
                         </div>
                       </td>
                       <td className="px-6 py-4 whitespace-nowrap">
-                        <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium border ${getStatusColor(order.status)}`}>
+                        <span
+                          className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium border ${getStatusColor(
+                            order.status
+                          )}`}
+                        >
                           {getStatusIcon(order.status)}
                           <span className="ml-1">{getStatusText(order.status)}</span>
                         </span>
@@ -371,14 +376,12 @@ export default function Dashboard() {
                 </tbody>
               </table>
             </div>
-            
+
             <div className="px-6 py-3 border-t border-gray-200 bg-gray-50">
               <div className="flex items-center justify-between">
-                <div className="text-sm text-gray-700">
-                  Показано 5 из 127 записей
-                </div>
+                <div className="text-sm text-gray-700">Показано 5 из 127 заказов</div>
                 <button className="inline-flex items-center text-sm text-blue-600 hover:text-blue-800 font-medium">
-                  Показать все заказы
+                  Все заказы
                   <ChevronRightIcon className="h-4 w-4 ml-1" />
                 </button>
               </div>
@@ -386,49 +389,45 @@ export default function Dashboard() {
           </div>
         </div>
 
-        {/* Популярные товары */}
         <div className="lg:col-span-1">
           <div className="bg-white border border-gray-200 rounded-lg shadow-sm">
             <div className="px-6 py-4 border-b border-gray-200">
               <div className="flex items-center justify-between">
-                <h2 className="text-lg font-semibold text-gray-900">Популярные товары</h2>
+                <h2 className="text-lg font-semibold text-gray-900">Топ товары</h2>
                 <button className="text-sm text-blue-600 hover:text-blue-800 font-medium">
                   Все товары
                 </button>
               </div>
             </div>
-            
+
             <div className="p-6 space-y-4">
               {topProducts.map((product) => (
                 <div key={product.id} className="flex items-center justify-between p-3 bg-gray-50 rounded-lg">
                   <div className="flex-1 min-w-0">
-                    <p className="text-sm font-medium text-gray-900 truncate">
-                      {product.name}
-                    </p>
+                    <p className="text-sm font-medium text-gray-900 truncate">{product.name}</p>
                     <div className="flex items-center mt-1 space-x-4">
-                      <span className="text-xs text-gray-500">
-                        Артикул: {product.sku}
-                      </span>
-                      <span className="text-xs text-gray-500">
-                        Остаток: {product.stock}
-                      </span>
+                      <span className="text-xs text-gray-500">Артикул: {product.sku}</span>
+                      <span className="text-xs text-gray-500">Остаток: {product.stock}</span>
                     </div>
                     <div className="flex items-center justify-between mt-2">
                       <span className="text-sm font-medium text-gray-900">
-                        {product.price.toLocaleString('ru-RU', { style: 'currency', currency: 'RUB' })}
+                        {product.price.toLocaleString('ru-RU', {
+                          style: 'currency',
+                          currency: 'RUB'
+                        })}
                       </span>
                       <span className="text-xs text-green-600 font-medium">
-                        Продано: {product.sales}
+                        Продажи: {product.sales}
                       </span>
                     </div>
                   </div>
                 </div>
               ))}
             </div>
-            
+
             <div className="px-6 py-3 border-t border-gray-200 bg-gray-50">
               <button className="w-full inline-flex items-center justify-center text-sm text-blue-600 hover:text-blue-800 font-medium">
-                Перейти к номенклатуре
+                Перейти к каталогу
                 <ChevronRightIcon className="h-4 w-4 ml-1" />
               </button>
             </div>
@@ -436,7 +435,6 @@ export default function Dashboard() {
         </div>
       </div>
 
-      {/* Быстрые действия */}
       <div className="bg-white border border-gray-200 rounded-lg shadow-sm">
         <div className="px-6 py-4 border-b border-gray-200">
           <h2 className="text-lg font-semibold text-gray-900">Быстрые действия</h2>
@@ -457,7 +455,7 @@ export default function Dashboard() {
             </button>
             <button className="flex flex-col items-center p-4 border border-gray-200 rounded-lg hover:bg-gray-50 transition-colors">
               <DocumentArrowDownIcon className="h-8 w-8 text-orange-600 mb-2" />
-              <span className="text-sm font-medium text-gray-900">Экспорт</span>
+              <span className="text-sm font-medium text-gray-900">Выгрузить</span>
             </button>
             <button className="flex flex-col items-center p-4 border border-gray-200 rounded-lg hover:bg-gray-50 transition-colors">
               <CalendarIcon className="h-8 w-8 text-red-600 mb-2" />
@@ -471,5 +469,5 @@ export default function Dashboard() {
         </div>
       </div>
     </div>
-  )
+  );
 }

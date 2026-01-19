@@ -1,7 +1,8 @@
 import expressAuth from 'express';
 import bcrypt from 'bcryptjs';
 import jwt from 'jsonwebtoken';
-const { db: authDb } = require('../database/init')
+import authenticateToken from '../middleware/auth';
+import { db as authDb } from '../database/init';
 
 const authRouter = expressAuth.Router()
 
@@ -94,6 +95,10 @@ authRouter.post('/login', async (req: any, res: any) => {
   } catch (error) {
     res.status(500).json({ error: 'Ошибка сервера' })
   }
+})
+
+authRouter.get('/me', authenticateToken, (req: any, res: any) => {
+  res.json({ user: req.user })
 })
 
 export default authRouter
